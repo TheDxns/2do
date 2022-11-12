@@ -1,9 +1,8 @@
-package io.github.thedxns.todo.logic;
+package io.github.thedxns.todo.tasklist;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import io.github.thedxns.todo.model.TaskList;
-import io.github.thedxns.todo.model.repositories.TaskListRepository;
+
 import java.util.List;
 
 @Service
@@ -14,6 +13,7 @@ public class TaskListService {
     public TaskListService(TaskListRepository taskListRepository) {
         this.taskListRepository = taskListRepository;
     }
+
     public List<TaskList> getAllTaskLists() {
         return taskListRepository.findAll();
     }

@@ -3,10 +3,10 @@ module.exports = {
         'vuetify'
     ],
     devServer: {
-        port: 3000,
+        port: 80,
         proxy: {
             '/api': {
-                target: 'http://localhost:8080',
+                target: 'http://localhost:9000',
                 ws: true,
                 changeOrigin: true
             }

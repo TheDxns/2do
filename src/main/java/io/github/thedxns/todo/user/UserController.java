@@ -1,10 +1,11 @@
-package io.github.thedxns.todo.controller;
+package io.github.thedxns.todo.user;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.json.JSONArray;
 import org.keycloak.OAuth2Constants;
@@ -24,8 +25,8 @@ import org.springframework.web.client.RestTemplate;
 @RequestMapping("/api/users")
 public class UserController {
 
-	private String keycloakServerUrl;
-    private String keycloakRealm;
+	private final String keycloakServerUrl;
+    private final String keycloakRealm;
 
 	public UserController(@Value("${keycloak.auth-server-url}") String keycloakServerUrl, @Value("${keycloak.realm}") String keycloakRealm) {
 		this.keycloakServerUrl = keycloakServerUrl;
@@ -34,7 +35,7 @@ public class UserController {
 
 	@GetMapping
 	public Object getAllUsers() {
-		Keycloak keycloak = KeycloakBuilder.builder()
+		final Keycloak keycloak = KeycloakBuilder.builder()
             .serverUrl(keycloakServerUrl)
             .grantType(OAuth2Constants.PASSWORD)
             .realm(keycloakRealm)
@@ -46,16 +47,16 @@ public class UserController {
                     .connectionPoolSize(10).build()
             ).build();
 
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
+        final RestTemplate restTemplate = new RestTemplate();
+        final HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + keycloak.tokenManager().getAccessToken().getToken());
-        HttpEntity<String> request = new HttpEntity<String>(headers);
+        final HttpEntity<String> request = new HttpEntity<String>(headers);
         return restTemplate.exchange(URI.create(keycloakServerUrl + "/admin/realms/Todo/users"), HttpMethod.GET, request, List.class).getBody();			
 	}
 
     @GetMapping("/username")
 	public List<String> getAllUsersUsernames() {
-		Keycloak keycloak = KeycloakBuilder.builder()
+		final Keycloak keycloak = KeycloakBuilder.builder()
             .serverUrl(keycloakServerUrl)
             .grantType(OAuth2Constants.PASSWORD)
             .realm(keycloakRealm)
@@ -67,13 +68,13 @@ public class UserController {
                     .connectionPoolSize(10).build()
             ).build();
 
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
+        final RestTemplate restTemplate = new RestTemplate();
+        final HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + keycloak.tokenManager().getAccessToken().getToken());
-        HttpEntity<String> request = new HttpEntity<String>(headers);
-        JSONArray userArray = new JSONArray(restTemplate.exchange(URI.create(keycloakServerUrl + "/admin/realms/Todo/users"), 
-        HttpMethod.GET, request, List.class).getBody());
-        List<String> users = new ArrayList<>();
+        final HttpEntity<String> request = new HttpEntity<String>(headers);
+        final JSONArray userArray = new JSONArray(restTemplate.exchange(URI.create(keycloakServerUrl + "/admin/realms/Todo/users"),
+            HttpMethod.GET, request, List.class).getBody());
+        final List<String> users = new ArrayList<>();
         String username = "";
         for (int i = 0; i < userArray.length(); i++) {
             username = userArray.getJSONObject(i).getString("username");
@@ -84,7 +85,7 @@ public class UserController {
 
     @GetMapping("/{id}")
 	public Object getUser(@PathVariable String id) {
-	Keycloak keycloak = KeycloakBuilder.builder()
+	final Keycloak keycloak = KeycloakBuilder.builder()
         .serverUrl("http://localhost:8180/auth")
         .grantType(OAuth2Constants.PASSWORD)
         .realm("Todo")
@@ -96,16 +97,16 @@ public class UserController {
                 .connectionPoolSize(10).build()
         ).build();
 
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
+        final RestTemplate restTemplate = new RestTemplate();
+        final HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + keycloak.tokenManager().getAccessToken().getToken());
-        HttpEntity<String> request = new HttpEntity<String>(headers);
+        final HttpEntity<String> request = new HttpEntity<String>(headers);
         return restTemplate.exchange(URI.create(keycloakServerUrl + "/admin/realms/Todo/users/" + id), HttpMethod.GET, request, Object.class).getBody();			
 	}
 
     @GetMapping("/id/{key}")
 	public String getUserByUsername(@PathVariable String key) {
-		Keycloak keycloak = KeycloakBuilder.builder()
+		final Keycloak keycloak = KeycloakBuilder.builder()
             .serverUrl(keycloakServerUrl)
             .grantType(OAuth2Constants.PASSWORD)
             .realm(keycloakRealm)
@@ -117,13 +118,13 @@ public class UserController {
                     .connectionPoolSize(10).build()
             ).build();
 
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
+        final RestTemplate restTemplate = new RestTemplate();
+        final HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + keycloak.tokenManager().getAccessToken().getToken());
-        HttpEntity<String> request = new HttpEntity<String>(headers);
-        JSONArray userArray = new JSONArray(restTemplate.exchange(URI.create(keycloakServerUrl + "/admin/realms/Todo/users"), 
-        HttpMethod.GET, request, List.class).getBody());
-        Map<String, String> users = new TreeMap<>();
+        final HttpEntity<String> request = new HttpEntity<String>(headers);
+        final JSONArray userArray = new JSONArray(restTemplate.exchange(URI.create(keycloakServerUrl + "/admin/realms/Todo/users"),
+            HttpMethod.GET, request, List.class).getBody());
+        final Map<String, String> users = new TreeMap<>();
         String username = "";
         String id = "";
         for (int i = 0; i < userArray.length(); i++) {
@@ -136,7 +137,7 @@ public class UserController {
 
     @GetMapping("/username/{key}")
 	public String getUsername(@PathVariable String key) {
-		Keycloak keycloak = KeycloakBuilder.builder()
+		final Keycloak keycloak = KeycloakBuilder.builder()
             .serverUrl(keycloakServerUrl)
             .grantType(OAuth2Constants.PASSWORD)
             .realm(keycloakRealm)
@@ -148,13 +149,13 @@ public class UserController {
                     .connectionPoolSize(10).build()
             ).build();
 
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
+        final RestTemplate restTemplate = new RestTemplate();
+        final HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + keycloak.tokenManager().getAccessToken().getToken());
-        HttpEntity<String> request = new HttpEntity<String>(headers);
-        JSONArray userArray = new JSONArray(restTemplate.exchange(URI.create(keycloakServerUrl + "/admin/realms/Todo/users"), 
-        HttpMethod.GET, request, List.class).getBody());
-        Map<String, String> users = new TreeMap<>();
+        final HttpEntity<String> request = new HttpEntity<String>(headers);
+        final JSONArray userArray = new JSONArray(restTemplate.exchange(URI.create(keycloakServerUrl + "/admin/realms/Todo/users"),
+            HttpMethod.GET, request, List.class).getBody());
+        final Map<String, String> users = new TreeMap<>();
         String username = "";
         String id = "";
         for (int i = 0; i < userArray.length(); i++) {

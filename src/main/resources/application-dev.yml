@@ -3,7 +3,7 @@ spring:
     enabled: true
     path: /console
     settings.web-allow-others: true
-  datasource.url: jdbc:h2:file:/D:/Workspace/todo/newtestdb
+  datasource.url: jdbc:h2:file:/C:/Workspace/todo/testdb
   
 management:
   endpoints:

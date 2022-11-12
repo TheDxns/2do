@@ -12,7 +12,7 @@ Vue.use(VueKeycloakJs, {
     checkLoginFrame: false
   },
   config: {
-    url: 'http://localhost:8180/auth/',
+    url: 'http://localhost:8080/auth/',
     realm: 'Todo',
     clientId: 'todo-client'
   },

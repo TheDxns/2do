@@ -1,4 +1,4 @@
-package io.github.thedxns.todo;
+package io.github.thedxns.todo.task;
 
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -12,9 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import io.github.thedxns.todo.logic.TaskService;
-import io.github.thedxns.todo.model.Task;
-import io.github.thedxns.todo.model.repositories.TaskRepository;
+import io.github.thedxns.todo.task.TaskService;
+import io.github.thedxns.todo.task.Task;
+import io.github.thedxns.todo.task.TaskRepository;
 
 @SpringBootTest
 public class TaskServiceTests {

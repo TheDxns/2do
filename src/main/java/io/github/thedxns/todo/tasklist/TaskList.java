@@ -1,6 +1,7 @@
-package io.github.thedxns.todo.model;
+package io.github.thedxns.todo.tasklist;
 
 import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;

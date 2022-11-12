@@ -1,7 +1,9 @@
-package io.github.thedxns.todo.controller;
+package io.github.thedxns.todo.task;
 
 import java.util.List;
+
 import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -15,19 +17,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.github.thedxns.todo.logic.TaskListService;
-import io.github.thedxns.todo.logic.TaskService;
-import io.github.thedxns.todo.model.Task;
+import io.github.thedxns.todo.tasklist.TaskListService;
 
 @RestController
 @RequestMapping("/api/tasks")
 public class TaskController {
 
-    private TaskService taskService;
-    private TaskListService taskListService;
+    private final TaskService taskService;
+    private final TaskListService taskListService;
 
     @Autowired
-    public TaskController(TaskService taskService, TaskListService taskListService) {
+    public TaskController(final TaskService taskService, final TaskListService taskListService) {
         this.taskService = taskService;
         this.taskListService = taskListService;
     }
@@ -110,7 +110,7 @@ public class TaskController {
         if(!taskService.existsById(id)) {
             return ResponseEntity.notFound().build();
         } else {
-            if(taskService.deleteTask(id)) {
+            if (taskService.deleteTask(id)) {
                 return ResponseEntity.ok().build();
             } else {
                 return ResponseEntity.internalServerError().build();
@@ -120,7 +120,7 @@ public class TaskController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateTask(@PathVariable Long id, @RequestBody @Valid Task task) {
-        if(!taskService.existsById(id)) {
+        if (!taskService.existsById(id)) {
             return ResponseEntity.notFound().build();
         } else {
             if(taskService.updateTask(id, task)) {
@@ -136,10 +136,10 @@ public class TaskController {
         if(!taskService.existsById(id)) {
             return ResponseEntity.notFound().build();
         } else {
-            Task task = taskService.getTask(id);
+            final Task task = taskService.getTask(id);
             task.setTaskList(null);
             task.setDone(true);
-            if(taskService.updateTask(id, task)) {
+            if (taskService.updateTask(id, task)) {
                 return ResponseEntity.noContent().build();
             } else {
                 return ResponseEntity.internalServerError().build(); 
@@ -149,16 +149,16 @@ public class TaskController {
 
     @PatchMapping("/prioritize/{id}")
     public ResponseEntity<?> prioritizeTask(@PathVariable Long id) {
-        if(!taskService.existsById(id)) {
+        if (!taskService.existsById(id)) {
             return ResponseEntity.notFound().build();
         } else {
-            Task task = taskService.getTask(id);
+            final Task task = taskService.getTask(id);
             if(task.isPrioritized() == false) {
                 task.setPrioritized(true);
             } else {
                 task.setPrioritized(false);
             }
-            if(taskService.updateTask(id, task)) {
+            if (taskService.updateTask(id, task)) {
                 return ResponseEntity.noContent().build();
             } else {
                 return ResponseEntity.internalServerError().build(); 

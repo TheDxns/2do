@@ -1,9 +1,11 @@
-package io.github.thedxns.todo.model.repositories;
+package io.github.thedxns.todo.task;
 
 import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import io.github.thedxns.todo.model.Task;
+
+import io.github.thedxns.todo.task.Task;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long>{

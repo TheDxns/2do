@@ -1,10 +1,9 @@
-package io.github.thedxns.todo.logic;
+package io.github.thedxns.todo.task;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import io.github.thedxns.todo.model.Task;
-import io.github.thedxns.todo.model.repositories.TaskRepository;
+
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,6 +17,7 @@ public class TaskService {
     public TaskService(TaskRepository taskRepository) {
         this.taskRepository = taskRepository;
     }
+
     public List<Task> getAllTasks() {
         return taskRepository.findAll();
     }

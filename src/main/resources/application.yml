@@ -9,7 +9,7 @@ spring:
 
 keycloak:
   realm: 'Todo'
-  auth-server-url: 'http://localhost:8180/auth'
+  auth-server-url: 'http://localhost:8080/auth'
   resource: 'todo-api'
   ssl-required: none
   use-resource-role-mappings: true
@@ -20,3 +20,6 @@ logging:
     root: INFO
   file.name: C:/Workspace/todo/logs.log
   pattern.file: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+server:
+  port: 9000

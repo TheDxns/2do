@@ -1,0 +1,22 @@
+spring:
+  main:
+    banner-mode: off
+  profiles:
+    active: dev
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+keycloak:
+  realm: 'Todo'
+  auth-server-url: 'http://localhost:8180/auth'
+  resource: 'todo-api'
+  ssl-required: none
+  use-resource-role-mappings: true
+  bearer-only: true
+
+logging:
+  level:
+    root: INFO
+  file.name: C:/Workspace/todo/logs.log
+  pattern.file: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"

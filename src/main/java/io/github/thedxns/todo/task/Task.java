@@ -17,7 +17,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
-public class Task {
+class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -83,10 +83,6 @@ public class Task {
     @PreUpdate
     void preUpdate() {
         this.setUpdatedOn(LocalDateTime.now());
-    }
-
-    public Long getId() {
-        return id;
     }
 
     public void setId(Long id) {

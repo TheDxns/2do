@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class TaskService {
+class TaskService {
     private final TaskRepository taskRepository;
 
     @Autowired
@@ -54,25 +54,25 @@ public class TaskService {
     public List<Task> getUnfinishedByCreator(String creatorId) {
         List<Task> allTasks = taskRepository.findByCreatorId(creatorId);
         return allTasks.stream()
-            .filter(t -> t.isDone() == false && t.getTaskList() == null).collect(Collectors.toList());
+            .filter(t -> !t.isDone() && t.getTaskList() == null).collect(Collectors.toList());
     }
 
     public List<Task> getDoneByCreator(String creatorId) {
         List<Task> allTasks = taskRepository.findByCreatorId(creatorId);
         return allTasks.stream()
-            .filter(t -> t.isDone() == true && t.getTaskList() == null).collect(Collectors.toList());
+            .filter(t -> t.isDone() && t.getTaskList() == null).collect(Collectors.toList());
     }
 
     public List<Task> getImportantByCreator(String creatorId) {
         List<Task> allTasks = taskRepository.findByCreatorId(creatorId);
         return allTasks.stream()
-            .filter(t -> t.isDone() == false && t.isPrioritized() == true).collect(Collectors.toList());
+            .filter(t -> !t.isDone() && t.isPrioritized()).collect(Collectors.toList());
     }
 
     public List<Task> getCustom(Long listId) {
         List<Task> allTasks = taskRepository.findByTaskListId(listId);
         return allTasks.stream()
-            .filter(t -> t.isDone() == false && t.getTaskList() != null).collect(Collectors.toList());
+            .filter(t -> !t.isDone() && t.getTaskList() != null).collect(Collectors.toList());
     }
 
     public boolean saveTask(Task task) {

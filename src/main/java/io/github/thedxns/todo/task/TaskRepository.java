@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import io.github.thedxns.todo.task.Task;
 
 @Repository
-public interface TaskRepository extends JpaRepository<Task, Long>{
+interface TaskRepository extends JpaRepository<Task, Long>{
     List<Task> findByPrioritized(boolean b);
     List<Task> findByCreatorId(String creatorId);
     List<Task> findByTaskListId(Long id);

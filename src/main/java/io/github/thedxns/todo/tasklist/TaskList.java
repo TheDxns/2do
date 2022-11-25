@@ -31,13 +31,9 @@ public class TaskList {
         
     }
 
-    public TaskList(Long id, String title, List<String> users) {
+    public TaskList(String title, List<String> users) {
         this.title = title;
         this.users = users;
-    }
-
-    public Long getId() {
-        return id;
     }
 
     public void setId(Long id) {

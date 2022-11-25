@@ -20,24 +20,24 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/lists")
-public class TaskListController {
+class TaskListController {
 
     private final TaskListService taskListService;
     private final UserController userController;
 
     @Autowired
-    public TaskListController(final TaskListService taskListService, final UserController userController) {
+    TaskListController(final TaskListService taskListService, final UserController userController) {
         this.taskListService = taskListService;
         this.userController = userController;
     }
     
     @GetMapping()
-    public ResponseEntity<List<TaskList>> getTaskLists() {
+    private ResponseEntity<List<TaskList>> getTaskLists() {
         return ResponseEntity.ok(taskListService.getAllTaskLists());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getTaskById(@PathVariable Long id) {
+    private ResponseEntity<?> getTaskById(@PathVariable Long id) {
         if (!taskListService.existsById(id)) {
             return ResponseEntity.notFound().build();
         } else {
@@ -46,12 +46,12 @@ public class TaskListController {
     }
 
     @GetMapping("/user/{username}")
-    public ResponseEntity<List<TaskList>> getTaskListsByUser(@PathVariable String username) {
+    private ResponseEntity<List<TaskList>> getTaskListsByUser(@PathVariable String username) {
         return ResponseEntity.ok(taskListService.getAllByUser(username));
     }
 
     @PostMapping
-    public ResponseEntity<?> saveTaskList(@Valid @RequestBody TaskList taskList) throws Exception {
+    private ResponseEntity<?> saveTaskList(@Valid @RequestBody TaskList taskList) {
         if (taskListService.saveTaskList(taskList)) {
             return ResponseEntity.ok().build();
         } else {
@@ -60,7 +60,7 @@ public class TaskListController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTaskList(@PathVariable Long id) {
+    private ResponseEntity<?> deleteTaskList(@PathVariable Long id) {
         if (!taskListService.existsById(id)) {
             return ResponseEntity.notFound().build();
         } else {
@@ -73,7 +73,7 @@ public class TaskListController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateTaskList(@PathVariable Long id, @RequestBody @Valid TaskList taskList) {
+    private ResponseEntity<?> updateTaskList(@PathVariable Long id, @RequestBody @Valid TaskList taskList) {
         if (!taskListService.existsById(id)) {
             return ResponseEntity.notFound().build();
         } else {
@@ -88,7 +88,7 @@ public class TaskListController {
     }
 
     @PatchMapping("/access/{id}/{username}")
-    public ResponseEntity<?> grantAccessToUser(@PathVariable Long id, @PathVariable String username) {
+    private ResponseEntity<?> grantAccessToUser(@PathVariable Long id, @PathVariable String username) {
         final String userId = userController.getUserByUsername(username);
         final TaskList taskList = taskListService.getTaskList(id);
         final List<String> users = taskList.getUsers();
@@ -101,7 +101,7 @@ public class TaskListController {
     }
 
     @PatchMapping("/access/remove/{id}/{username}")
-    public ResponseEntity<?> removeAccessOfUser(@PathVariable Long id, @PathVariable String username) {
+    private ResponseEntity<?> removeAccessOfUser(@PathVariable Long id, @PathVariable String username) {
         final String userId = userController.getUserByUsername(username);
         final TaskList taskList = taskListService.getTaskList(id);
         final List<String> users = taskList.getUsers();
@@ -114,7 +114,7 @@ public class TaskListController {
     }
 
     @GetMapping("/access/{id}")
-    public ResponseEntity<List<String>> getPermittedUsers(@PathVariable Long id) {
+    private ResponseEntity<List<String>> getPermittedUsers(@PathVariable Long id) {
         final TaskList taskList = taskListService.getTaskList(id);
         final List<String> users = taskList.getUsers();
         final List<String> usernames = new ArrayList<>();

@@ -21,7 +21,7 @@ import io.github.thedxns.todo.tasklist.TaskListService;
 
 @RestController
 @RequestMapping("/api/tasks")
-public class TaskController {
+class TaskController {
 
     private final TaskService taskService;
     private final TaskListService taskListService;
@@ -87,7 +87,7 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<?> saveTask(@Valid @RequestBody Task task) throws Exception {
+    public ResponseEntity<?> saveTask(@Valid @RequestBody Task task) {
         if (taskService.saveTask(task)) {
             return ResponseEntity.ok().build();
         } else {
@@ -96,7 +96,7 @@ public class TaskController {
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<?> saveCustomListTask(@PathVariable Long id, @Valid @RequestBody Task task) throws Exception {
+    public ResponseEntity<?> saveCustomListTask(@PathVariable Long id, @Valid @RequestBody Task task) {
         task.setTaskList(taskListService.getTaskList(id));
         if (taskService.saveTask(task)) {
             return ResponseEntity.ok().build();
@@ -153,11 +153,7 @@ public class TaskController {
             return ResponseEntity.notFound().build();
         } else {
             final Task task = taskService.getTask(id);
-            if(task.isPrioritized() == false) {
-                task.setPrioritized(true);
-            } else {
-                task.setPrioritized(false);
-            }
+            task.setPrioritized(!task.isPrioritized());
             if (taskService.updateTask(id, task)) {
                 return ResponseEntity.noContent().build();
             } else {

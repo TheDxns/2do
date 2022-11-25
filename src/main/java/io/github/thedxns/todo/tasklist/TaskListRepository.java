@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import io.github.thedxns.todo.tasklist.TaskList;
 
 @Repository
-public interface TaskListRepository extends JpaRepository<TaskList, Long> {
+interface TaskListRepository extends JpaRepository<TaskList, Long> {
     List<TaskList> findByUsers(String username);
     void deleteByUsers(String id);
 }

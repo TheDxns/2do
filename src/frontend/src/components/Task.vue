@@ -2,14 +2,14 @@
 <v-container>
   <v-expansion-panel>
         <v-expansion-panel-header @click="getPermittedUsers()">
-          <span v-if="task.prioritized==false">{{task.title}}</span>
+          <span v-if= "task.prioritized === false">{{task.title}}</span>
           <span v-else style="color:red;">{{task.title}}</span>
           <span style="color:grey;" v-if="task.deadline != null">({{task.deadline | formatDate}})</span>
           <v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer>
           <v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer>
           <v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer>
     
-        <span @click.stop="setTaskAsDone">Oznacz jako wykonane</span> <span v-if="task.prioritized==false" @click.stop="toggleImportant">Zwiększ priorytet</span> <span v-else @click.stop="toggleImportant">Zmiejsz priorytet</span> <span style="color: red;"  @click.stop="deleteTask">Usuń</span>
+        <span @click.stop="setTaskAsDone">Oznacz jako wykonane</span> <span v-if="task.prioritized === false" @click.stop="toggleImportant">Zwiększ priorytet</span> <span v-else @click.stop="toggleImportant">Zmiejsz priorytet</span> <span style="color: red;" @click.stop="deleteTask">Usuń</span>
         </v-expansion-panel-header>
         <v-expansion-panel-content>
         
@@ -89,10 +89,10 @@ export default {
     }
   },
   computed: {
-    deadline: function(){
-      if(this.newDeadline == '' && this.task.deadline == null) {
+    deadline: function() {
+      if (this.newDeadline === '' && this.task.deadline == null) {
         return null;
-      } else if (this.newDeadline == '') {
+      } else if (this.newDeadline === '') {
         let date = new Date(this.task.deadline);
         date.setDate(date.getDate() + 1);
         return date.toISOString().substring(0, 10);
@@ -119,7 +119,7 @@ export default {
         .catch(err => console.log(err));
     },
     setTaskAsDone() {
-      fetch("/api/tasks/finish/" + this.task.id, { method: 'PATCH',
+      fetch("/api/tasks/finish/" + this.task.id, { method: 'patch',
       headers: {
           'Accept': '*',
           'Host': ''
@@ -131,7 +131,7 @@ export default {
         .catch(err => console.log(err));
     },
     toggleImportant() {
-      fetch("/api/tasks/prioritize/" + this.task.id, { method: 'PATCH' })
+      fetch("/api/tasks/prioritize/" + this.task.id, { method: 'patch' })
         .then((response) => {
             console.log(response.status);
             this.$emit('dataUpdate')

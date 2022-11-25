@@ -13,7 +13,7 @@
         <strong class="subheading"></strong>
         <v-spacer></v-spacer>
         <v-card-text class="py-0  white--text text-center">
-        © {{ new Date().getFullYear() }} — <strong>Grupa H</strong>
+        © {{ new Date().getFullYear() }} — <strong>TheDxns</strong>
         </v-card-text>
       </v-card-title>
     </v-card>

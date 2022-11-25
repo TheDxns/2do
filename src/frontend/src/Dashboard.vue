@@ -16,7 +16,7 @@
                     outlined
                     tile
                     link
-                    @click="currentListName='Wszystkie zadania', currentListId=null"
+                    @click="currentListName='Wszystkie zadania', currentListId = null"
                   >
                     <v-card-text class="font-weight-light" style="max-height: 50px; overflow:hidden;">
                       <p class="text-h5 text--primary mx-2">
@@ -201,7 +201,7 @@ export default {
                 }).then(response => response.text())
                   .then((response) => {
                       console.log(response);
-                      this.newTaskListTitle="";
+                      this.newTaskListTitle = "";
                       this.getLists();
                   })
                   .catch(err => console.log(err));

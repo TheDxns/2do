@@ -3,7 +3,7 @@
     <p class="text-h5 text--primary mx-2 mt-7">
       Obecnie wybrana lista: {{currentListName}}
     </p>
-    <div v-if="this.currentListName != 'Wszystkie zadania' && this.currentListName != 'Ukończone' && this.currentListName != 'Priorytetowe'">
+    <div v-if="this.currentListName !== 'Wszystkie zadania' && this.currentListName !== 'Ukończone' && this.currentListName !== 'Priorytetowe'">
       <v-menu
         v-model="listSharingMenu"
         :close-on-content-click="false"
@@ -20,9 +20,7 @@
               Udostępnij
             </v-btn>
         </template>
-
-        <v-card
-        @keyup.enter="shareCustomList()">
+        <v-card @keyup.enter="shareCustomList()">
           <v-list>
             <v-list-item>
               <b>Udostępnianie listy zadań</b>
@@ -61,14 +59,13 @@
               class="green--text text--darken-1"
               text
               @click="shareCustomList()"
-              
             >
               Udostępnij
             </v-btn>
-            </v-card-actions>
-            </v-card>
-          </v-menu>
-            <v-menu
+          </v-card-actions>
+        </v-card>
+      </v-menu>
+      <v-menu
         v-model="listEditMenu"
         :close-on-content-click="false"
         :nudge-width="200"
@@ -84,7 +81,6 @@
               Edytuj
             </v-btn>
         </template>
-
         <v-card
         @keyup.enter="updateCustomList()">
           <v-list>
@@ -117,55 +113,55 @@
               text
               class="green--text text--darken-1"
               @click="updateCustomList()"
-              
+
             >
               Aktualizuj
             </v-btn>
-             </v-card-actions>
-            </v-card>
-          </v-menu>
-            <v-btn
-              class="mb-5"
-              text
-              color="error"
-              @click="deleteTaskList()">
-                Usuń listę
-            </v-btn> 
+          </v-card-actions>
+        </v-card>
+      </v-menu>
+      <v-btn
+        class="mb-5"
+        text
+        color="error"
+        @click="deleteTaskList()">
+          Usuń listę
+      </v-btn>
     </div>
-    <div v-if="this.currentListName != 'Ukończone'"> 
-    <v-text-field
-            v-model="newTaskTitle"
-            class="ml-3"
-            label="Dodaj nowe zadanie"
-            outlined
-            style="width: 25%;"
-            placeholder="Zatwierdź zadanie przyciskiem Enter"
-          ></v-text-field> 
-          <p class="text-h6 text--primary ml-3">
-            Zadania do wykonania:
-          </p>
+    <div v-if="this.currentListName !== 'Ukończone'">
+      <v-text-field
+        v-model="newTaskTitle"
+        class="ml-3"
+        label="Dodaj nowe zadanie"
+        outlined
+        style="width: 25%;"
+        placeholder="Zatwierdź zadanie przyciskiem Enter"
+      ></v-text-field>
+      <p class="text-h6 text--primary ml-3">
+        Zadania do wykonania:
+      </p>
     </div>
     <div v-else> 
-    <v-text-field
-            v-model="newTaskTitle"
-            label="Dodaj nowe zadanie"
-            class="ml-3"
-            outlined
-            disabled
-            style="width: 25%;"
-            placeholder="Zatwierdź zadanie przyciskiem Enter"
-          ></v-text-field> 
-          <p class="text-h6 text--primary ml-3">
-            Wykonane zadania:
-          </p>
+      <v-text-field
+        v-model="newTaskTitle"
+        label="Dodaj nowe zadanie"
+        class="ml-3"
+        outlined
+        disabled
+        style="width: 25%;"
+        placeholder="Zatwierdź zadanie przyciskiem Enter"
+      ></v-text-field>
+      <p class="text-h6 text--primary ml-3">
+        Wykonane zadania:
+      </p>
     </div>
-    <v-expansion-panels focusable v-if="this.currentListName == 'Wszystkie zadania'">
+    <v-expansion-panels focusable v-if="this.currentListName === 'Wszystkie zadania'">
       <Task v-for="task in allTasks" :key="task.title" v-bind:task="task" :keycloakData="keycloakData" @dataUpdate="getAllTasks"/>
     </v-expansion-panels>
-    <v-expansion-panels focusable v-if="this.currentListName == 'Priorytetowe'">
+    <v-expansion-panels focusable v-if="this.currentListName === 'Priorytetowe'">
       <Task v-for="task in importantTasks" :key="task.title" v-bind:task="task" :keycloakData="keycloakData" @dataUpdate="getAllTasks"/>
     </v-expansion-panels>
-    <v-expansion-panels focusable v-if="this.currentListName == 'Ukończone'">
+    <v-expansion-panels focusable v-if="this.currentListName === 'Ukończone'">
       <Task v-for="task in doneTasks" :key="task.title" v-bind:task="task" :keycloakData="keycloakData" @dataUpdate="getAllTasks"/>
     </v-expansion-panels>
     <v-expansion-panels focusable v-if="this.currentListId != null">
@@ -211,66 +207,66 @@ import Task from '@/components/Task.vue'
           this.getCustomListTasks();
         },
         getUnfinishedTasks() {
-            fetch("/api/tasks/unfinished/user/" + this.$keycloak.idTokenParsed.sub)
-              .then((response) => response.json())
-              .then((data) => {
-                data.sort(function compare(a, b) {
-                    let dateA = new Date(a.deadline);
-                    let dateB = new Date(b.deadline);
-                    if (a.deadline == null) {
-                      dateA = new Date("2100-01-01");
-                    } 
-                    if (b.deadline == null) {
-                      dateB = new Date("2100-01-02");
-                    }
-                    console.log(dateA + " | " + dateB)
-                    return dateA - dateB;
-                });
-                this.allTasks = data;
-              })
+          fetch("/api/tasks/unfinished/user/" + this.$keycloak.idTokenParsed.sub)
+            .then((response) => response.json())
+            .then((data) => {
+              data.sort(function compare(a, b) {
+                  let dateA = new Date(a.deadline);
+                  let dateB = new Date(b.deadline);
+                  if (a.deadline == null) {
+                    dateA = new Date("2100-01-01");
+                  }
+                  if (b.deadline == null) {
+                    dateB = new Date("2100-01-02");
+                  }
+                  console.log(dateA + " | " + dateB)
+                  return dateA - dateB;
+              });
+              this.allTasks = data;
+            })
         },
         getImportantTasks() {
-            fetch("/api/tasks/important/user/" + this.$keycloak.idTokenParsed.sub)
-              .then((response) => response.json())
-              .then((data) => {
-                  data.sort(function compare(a, b) {
-                    let dateA = new Date(a.deadline);
-                    let dateB = new Date(b.deadline);
-                    if (a.deadline == null) {
-                      dateA = new Date("2100-01-01");
-                    } 
-                    if (b.deadline == null) {
-                      dateB = new Date("2100-01-02");
-                    }
-                    console.log(dateA + " | " + dateB)
-                    return dateA - dateB;
-                  });
-                  this.importantTasks = data;
-              })
+          fetch("/api/tasks/important/user/" + this.$keycloak.idTokenParsed.sub)
+            .then((response) => response.json())
+            .then((data) => {
+                data.sort(function compare(a, b) {
+                  let dateA = new Date(a.deadline);
+                  let dateB = new Date(b.deadline);
+                  if (a.deadline == null) {
+                    dateA = new Date("2100-01-01");
+                  }
+                  if (b.deadline == null) {
+                    dateB = new Date("2100-01-02");
+                  }
+                  console.log(dateA + " | " + dateB)
+                  return dateA - dateB;
+                });
+                this.importantTasks = data;
+            })
         },
         getDoneTasks() {
-            fetch("/api/tasks/done/user/" + this.$keycloak.idTokenParsed.sub)
-              .then((response) => response.json())
-              .then((data) => {
-                  data.sort(function compare(a, b) {
-                    let dateA = new Date(a.deadline);
-                    let dateB = new Date(b.deadline);
-                    if (a.deadline == null) {
-                      dateA = new Date("2100-01-01");
-                    } 
-                    if (b.deadline == null) {
-                      dateB = new Date("2100-01-02");
-                    }
-                    console.log(dateA + " | " + dateB)
-                    return dateA - dateB;
-                  });
-                  this.doneTasks = data;
-              })
+          fetch("/api/tasks/done/user/" + this.$keycloak.idTokenParsed.sub)
+            .then((response) => response.json())
+            .then((data) => {
+                data.sort(function compare(a, b) {
+                  let dateA = new Date(a.deadline);
+                  let dateB = new Date(b.deadline);
+                  if (a.deadline == null) {
+                    dateA = new Date("2100-01-01");
+                  }
+                  if (b.deadline == null) {
+                    dateB = new Date("2100-01-02");
+                  }
+                  console.log(dateA + " | " + dateB)
+                  return dateA - dateB;
+                });
+                this.doneTasks = data;
+            })
         },
         getCustomListTasks() {
           setTimeout(() => {  
-          if(this.currentListId != null) {
-          fetch("/api/tasks/unfinished/custom/" + this.currentListId)
+          if (this.currentListId != null) {
+            fetch("/api/tasks/unfinished/custom/" + this.currentListId)
               .then((response) => response.json())
               .then((data) => {
                   data.sort(function compare(a, b) {
@@ -278,7 +274,7 @@ import Task from '@/components/Task.vue'
                     let dateB = new Date(b.deadline);
                     if (a.deadline == null) {
                       dateA = new Date("2100-01-01");
-                    } 
+                    }
                     if (b.deadline == null) {
                       dateB = new Date("2100-01-02");
                     }
@@ -297,19 +293,14 @@ import Task from '@/components/Task.vue'
               })
         },
         addTask() {
-          if(this.currentListId == null) {
+          if (this.currentListId == null) {
             this.addStandardTask();
           } else {
             this.addTaskToCustomList();
           }
         },
         addStandardTask() {
-          let important;
-          if (this.currentListName == "Priorytetowe") {
-            important = true;
-          } else {
-            important = false;
-          }
+          let important = this.currentListName === "Priorytetowe";
           fetch("/api/tasks", {
                   method: 'post',
                   headers: {
@@ -329,12 +320,7 @@ import Task from '@/components/Task.vue'
                   .catch(err => console.log(err));
         },
         addTaskToCustomList() {
-          let important;
-          if (this.currentListName == "Priorytetowe") {
-            important = true;
-          } else {
-            important = false;
-          }
+          let important = this.currentListName === "Priorytetowe";
           fetch("/api/tasks/" + this.currentListId, {
                   method: 'post',
                   headers: {
@@ -367,7 +353,7 @@ import Task from '@/components/Task.vue'
           if (this.permittedUsers.includes(this.username)) {
             window.alert("Podany użytkownik już ma dostęp do listy.")
           } else {
-          fetch("/api/lists/access/" + this.currentListId + "/" + this.username, { method: 'PATCH',
+          fetch("/api/lists/access/" + this.currentListId + "/" + this.username, { method: 'patch',
           headers: {
               'Accept': '*',
               'Host': ''
@@ -412,7 +398,7 @@ import Task from '@/components/Task.vue'
               })
         },
         removeAccess(username) {
-          fetch("/api/lists/access/remove/" + this.currentListId + "/" + username, { method: 'PATCH',
+          fetch("/api/lists/access/remove/" + this.currentListId + "/" + username, { method: 'patch',
           headers: {
             'Accept': '*',
             'Host': ''

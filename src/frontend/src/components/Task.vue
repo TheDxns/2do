@@ -119,7 +119,7 @@ export default {
         .catch(err => console.log(err));
     },
     setTaskAsDone() {
-      fetch("/api/tasks/finish/" + this.task.id, { method: 'patch',
+      fetch("/api/tasks/finish/" + this.task.id, { method: 'PATCH',
       headers: {
           'Accept': '*',
           'Host': ''
@@ -131,7 +131,7 @@ export default {
         .catch(err => console.log(err));
     },
     toggleImportant() {
-      fetch("/api/tasks/prioritize/" + this.task.id, { method: 'patch' })
+      fetch("/api/tasks/prioritize/" + this.task.id, { method: 'PATCH' })
         .then((response) => {
             console.log(response.status);
             this.$emit('dataUpdate')

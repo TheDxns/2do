@@ -197,7 +197,7 @@ export default {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                   },
-                  body:JSON.stringify({title:this.newTaskListTitle, users: this.users})
+                  body:JSON.stringify({title: this.newTaskListTitle, users: this.users})
                 }).then(response => response.text())
                   .then((response) => {
                       console.log(response);

@@ -18,7 +18,7 @@ keycloak:
 logging:
   level:
     root: INFO
-  file.name: C:/Workspace/todo/logs.log
+  file.name: C:/Workspace/logs/2do/logs.log
   pattern.file: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
 
 server:

@@ -353,7 +353,7 @@ import Task from '@/components/Task.vue'
           if (this.permittedUsers.includes(this.username)) {
             window.alert("Podany użytkownik już ma dostęp do listy.")
           } else {
-          fetch("/api/lists/access/" + this.currentListId + "/" + this.username, { method: 'patch',
+          fetch("/api/lists/access/" + this.currentListId + "/" + this.username, { method: 'PATCH',
           headers: {
               'Accept': '*',
               'Host': ''
@@ -398,7 +398,7 @@ import Task from '@/components/Task.vue'
               })
         },
         removeAccess(username) {
-          fetch("/api/lists/access/remove/" + this.currentListId + "/" + username, { method: 'patch',
+          fetch("/api/lists/access/remove/" + this.currentListId + "/" + username, { method: 'PATCH',
           headers: {
             'Accept': '*',
             'Host': ''

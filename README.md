@@ -1,4 +1,4 @@
-# To-do list web application
+# To-do list web application (Work in progress)
 
 # Features:
 - Task creation and management

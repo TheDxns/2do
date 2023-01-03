@@ -123,7 +123,7 @@ class TaskController {
         if (!taskService.existsById(id)) {
             return ResponseEntity.notFound().build();
         } else {
-            if(taskService.updateTask(id, task)) {
+            if (taskService.updateTask(id, task)) {
                 return ResponseEntity.noContent().build();
             } else {
                 return ResponseEntity.internalServerError().build(); 

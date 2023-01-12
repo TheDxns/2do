@@ -5,8 +5,8 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import io.github.thedxns.todo.user.UserController;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.github.thedxns.todo.user.KeycloakId;
+import io.github.thedxns.todo.user.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,12 +23,11 @@ import org.springframework.web.bind.annotation.RestController;
 class TaskListController {
 
     private final TaskListService taskListService;
-    private final UserController userController;
+    private final UserService userService;
 
-    @Autowired
-    TaskListController(final TaskListService taskListService, final UserController userController) {
+    TaskListController(final TaskListService taskListService, final UserService userService) {
         this.taskListService = taskListService;
-        this.userController = userController;
+        this.userService = userService;
     }
     
     @GetMapping()
@@ -73,12 +72,10 @@ class TaskListController {
     }
 
     @PutMapping("/{id}")
-    private ResponseEntity<?> updateTaskList(@PathVariable Long id, @RequestBody @Valid TaskList taskList) {
+    private ResponseEntity<?> updateTaskList(@PathVariable Long id, @RequestBody @Valid TaskListDto taskList) {
         if (!taskListService.existsById(id)) {
             return ResponseEntity.notFound().build();
         } else {
-            final TaskList originalTaskList = taskListService.getTaskList(id);
-            taskList.setUsers(originalTaskList.getUsers());
             if (taskListService.updateTaskList(id, taskList)) {
                 return ResponseEntity.noContent().build();
             } else {
@@ -89,9 +86,9 @@ class TaskListController {
 
     @PatchMapping("/access/{id}/{username}")
     private ResponseEntity<?> grantAccessToUser(@PathVariable Long id, @PathVariable String username) {
-        final String userId = userController.getUserByUsername(username);
-        final TaskList taskList = taskListService.getTaskList(id);
-        final List<String> users = taskList.getUsers();
+        final KeycloakId userId = userService.getUserId(username);
+        final TaskListDto taskList = taskListService.getTaskList(id);
+        final List<KeycloakId> users = taskList.getUsers();
         users.add(userId);
         if (taskListService.updateTaskList(id, taskList)) {
             return ResponseEntity.noContent().build();
@@ -102,9 +99,9 @@ class TaskListController {
 
     @PatchMapping("/access/remove/{id}/{username}")
     private ResponseEntity<?> removeAccessOfUser(@PathVariable Long id, @PathVariable String username) {
-        final String userId = userController.getUserByUsername(username);
-        final TaskList taskList = taskListService.getTaskList(id);
-        final List<String> users = taskList.getUsers();
+        final KeycloakId userId = userService.getUserId(username);
+        final TaskListDto taskList = taskListService.getTaskList(id);
+        final List<KeycloakId> users = taskList.getUsers();
         users.remove(userId);
         if (taskListService.updateTaskList(id, taskList)) {
             return ResponseEntity.noContent().build();
@@ -115,11 +112,11 @@ class TaskListController {
 
     @GetMapping("/access/{id}")
     private ResponseEntity<List<String>> getPermittedUsers(@PathVariable Long id) {
-        final TaskList taskList = taskListService.getTaskList(id);
-        final List<String> users = taskList.getUsers();
+        final TaskListDto taskList = taskListService.getTaskList(id);
+        final List<KeycloakId> users = taskList.getUsers();
         final List<String> usernames = new ArrayList<>();
-        for (String user : users) {
-            usernames.add(userController.getUsername(user));
+        for (KeycloakId user : users) {
+            usernames.add(userService.getUsername(user));
         }
         return ResponseEntity.ok(usernames);
     }

@@ -1,16 +1,14 @@
 package io.github.thedxns.todo.tasklist;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
-public
-class TaskListService {
+public class TaskListService {
     private final TaskListRepository taskListRepository;
 
-    @Autowired
     TaskListService(TaskListRepository taskListRepository) {
         this.taskListRepository = taskListRepository;
     }
@@ -19,32 +17,34 @@ class TaskListService {
         return taskListRepository.findAll();
     }
     
-    public TaskList getTaskList(Long id) {
-        return taskListRepository.findById(id).get();
+    public TaskListDto getTaskList(final Long id) {
+        final Optional<TaskList> taskList = taskListRepository.findById(id);
+        return taskList.map(TaskListDto::from).orElse(null);
     }
 
-    List<TaskList> getAllByUser(String username) {
+    List<TaskList> getAllByUser(final String username) {
         return taskListRepository.findByUsers(username);
     }
 
-    boolean saveTaskList(TaskList taskList) {
+    boolean saveTaskList(final TaskList taskList) {
         taskListRepository.save(taskList);
         return true;
     }
 
-    boolean deleteTaskList(Long id) {
+    boolean deleteTaskList(final Long id) {
         taskListRepository.deleteById(id);
         return true;
     }
 
-    boolean existsById(Long id) {
+    boolean existsById(final Long id) {
         return taskListRepository.existsById(id);
     }
 
-    boolean updateTaskList(Long id, TaskList taskList) {
-        taskList.setId(id);
-        taskList.updateFrom(taskList);
-        taskListRepository.save(taskList);
+    boolean updateTaskList(final Long id, final TaskListDto taskList) {
+        final TaskList updatedTaskList = new TaskList();
+        updatedTaskList.setId(id);
+        updatedTaskList.updateFromDto(taskList);
+        taskListRepository.save(updatedTaskList);
         return true;
     }
 }

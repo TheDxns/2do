@@ -1,6 +1,7 @@
 package io.github.thedxns.todo.task;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import io.github.thedxns.todo.tasklist.TaskList;
+import io.github.thedxns.todo.tasklist.TaskListService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -11,10 +12,12 @@ import java.util.stream.Collectors;
 
 @Service
 class TaskService {
+
+    private final TaskListService taskListService;
     private final TaskRepository taskRepository;
 
-    @Autowired
-    public TaskService(TaskRepository taskRepository) {
+    public TaskService(TaskListService taskListService, TaskRepository taskRepository) {
+        this.taskListService = taskListService;
         this.taskRepository = taskRepository;
     }
 
@@ -22,82 +25,80 @@ class TaskService {
         return taskRepository.findAll();
     }
 
-    public List<Task> getAllTasks(Pageable page) {
+    public List<Task> getAllTasks(final Pageable page) {
         return taskRepository.findAll(page).getContent();
     }
 
-    public List<Task> getAllPrioritized() {
-        return taskRepository.findByPrioritized(true);
-    }
-
-    public List<Task> getTasksByKeyword(String keyword) {
-        List<Task> tasks = taskRepository.findByTitleContainingIgnoreCase(keyword);
+    public List<Task> getTasksByKeyword(final String keyword) {
+        final List<Task> tasks = taskRepository.findByTitleContainingIgnoreCase(keyword);
         tasks.addAll(taskRepository.findByContentContainingIgnoreCase(keyword));
-        Set<Task> set = new LinkedHashSet<>(tasks);
+        final Set<Task> set = new LinkedHashSet<>(tasks);
         tasks.clear();
         tasks.addAll(set);
         return tasks;
     }
     
-    public Task getTask(Long id) {
+    public Task getTask(final Long id) {
         return taskRepository.findById(id).get();
     }
 
-    public List<Task> getTasksByList(Long id) {
+    public List<Task> getTasksByList(final Long id) {
         return taskRepository.findByTaskListId(id);
     } 
 
-    public List<Task> getAllByCreator(String creatorId) {
+    public List<Task> getAllByCreator(final String creatorId) {
         return taskRepository.findByCreatorId(creatorId);
     }
 
-    public List<Task> getUnfinishedByCreator(String creatorId) {
+    public List<Task> getUnfinishedByCreator(final String creatorId) {
         List<Task> allTasks = taskRepository.findByCreatorId(creatorId);
         return allTasks.stream()
-            .filter(t -> !t.isDone() && t.getTaskList() == null).collect(Collectors.toList());
+            .filter(t -> !t.getStatus().equals(TaskStatus.DONE) && t.getTaskList() == null).collect(Collectors.toList());
     }
 
-    public List<Task> getDoneByCreator(String creatorId) {
+    public List<Task> getDoneByCreator(final String creatorId) {
         List<Task> allTasks = taskRepository.findByCreatorId(creatorId);
         return allTasks.stream()
-            .filter(t -> t.isDone() && t.getTaskList() == null).collect(Collectors.toList());
+            .filter(t -> t.getStatus().equals(TaskStatus.DONE) && t.getTaskList() == null).collect(Collectors.toList());
     }
 
-    public List<Task> getImportantByCreator(String creatorId) {
+    public List<Task> getImportantByCreator(final String creatorId) {
         List<Task> allTasks = taskRepository.findByCreatorId(creatorId);
         return allTasks.stream()
-            .filter(t -> !t.isDone() && t.isPrioritized()).collect(Collectors.toList());
+            .filter(t -> !t.getStatus().equals(TaskStatus.DONE) && t.getPriority().equals(TaskPriority.MAJOR)).collect(Collectors.toList());
     }
 
-    public List<Task> getCustom(Long listId) {
+    public List<Task> getCustom(final Long listId) {
         List<Task> allTasks = taskRepository.findByTaskListId(listId);
         return allTasks.stream()
-            .filter(t -> !t.isDone() && t.getTaskList() != null).collect(Collectors.toList());
+            .filter(t -> !t.getStatus().equals(TaskStatus.DONE) && t.getTaskList() != null).collect(Collectors.toList());
     }
 
-    public boolean saveTask(Task task) {
-        taskRepository.save(task);
+    public boolean saveTask(final TaskDto taskData) {
+        taskRepository.save(new Task(taskData));
         return true;
     }
 
-    public boolean deleteTask(Long id) {
+    public boolean deleteTask(final Long id) {
         taskRepository.deleteById(id);
         return true;
     }
 
-    public boolean existsById(Long id) {
+    public boolean existsById(final Long id) {
         return taskRepository.existsById(id);
     }
 
-    public boolean updateTask(Long id, Task task) {
+    public boolean updateTask(final Long id, final Task task) {
         task.setId(id);
         task.updateFrom(task);
         taskRepository.save(task);
         return true;
     }
 
-    public boolean deleteAllByUser(String id) {
-        taskRepository.deleteByCreatorId(id);
+    public boolean saveCustomListTask(final Long taskListId, final TaskDto taskData) {
+        final Task task = new Task(taskData);
+        task.setTaskList(new TaskList(taskListService.getTaskList(taskListId)));
+        taskRepository.save(task);
         return true;
     }
 }

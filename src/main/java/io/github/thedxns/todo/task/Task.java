@@ -1,66 +1,56 @@
 package io.github.thedxns.todo.task;
 
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
 import io.github.thedxns.todo.tasklist.TaskList;
+import io.github.thedxns.todo.user.KeycloakId;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.data.annotation.PersistenceConstructor;
 
 @Entity
 class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
     @Column(length = 200)
     @NotBlank(message = "The task title must not be empty")
     private String title;
-
     @Column(length = 100000)
     private String content;
-
-    private boolean prioritized;
-
-    private boolean isDone;
-
+    private TaskPriority priority;
+    private TaskStatus status;
     @NotBlank(message = "The ID of the creator of the post must be set")
     private String creatorId;
-
     private String responsible;
-
     @ManyToOne
+    @JoinColumn(name = "task_list_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private TaskList taskList;
-
     private LocalDateTime deadline;
-
     private LocalDateTime createdOn;
-
     private LocalDateTime updatedOn;
 
+    @PersistenceConstructor
     public Task() {
     }
 
-    public Task(Task source) {
-        title = source.title;
-        content = source.content;
-        createdOn = source.createdOn;
-        updatedOn = source.updatedOn;
-        prioritized = source.prioritized;
-        creatorId = source.creatorId;
-        isDone = source.isDone;
-        deadline = source.deadline;
-        responsible = source.responsible;
+    public Task(TaskDto source) {
+        title = source.getTitle();
+        content = source.getDescription();
+        createdOn = source.getCreatedOn();
+        updatedOn = source.getUpdatedOn();
+        priority = source.getPriority();
+        creatorId = source.getCreator().getKeycloakId();
+        status = source.getStatus();
+        deadline = source.getDeadline();
+        responsible = source.getCreator().getName();
+        taskList = new TaskList(source.getTaskList().getTitle(), source.getTaskList().getUsers()
+                .stream().map(KeycloakId::getId).collect(Collectors.toList()));
     }
     
     public void updateFrom(final Task source) {
@@ -68,9 +58,9 @@ class Task {
         content = source.content;
         createdOn = source.createdOn;
         updatedOn = source.updatedOn;
-        prioritized = source.prioritized;
+        priority = source.priority;
         creatorId = source.creatorId;
-        isDone = source.isDone;
+        status = source.status;
         deadline = source.deadline;
         responsible = source.responsible;
     }
@@ -109,12 +99,28 @@ class Task {
         this.content = content;
     }
 
-    public boolean isPrioritized() {
-        return prioritized;
+    public TaskPriority getPriority() {
+        return priority;
     }
 
-    public void setPrioritized(boolean prioritized) {
-        this.prioritized = prioritized;
+    public void setPriority(TaskPriority priority) {
+        this.priority = priority;
+    }
+
+    public TaskStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(TaskStatus status) {
+        this.status = status;
+    }
+
+    public TaskList getTaskList() {
+        return taskList;
+    }
+
+    public void setTaskList(TaskList taskList) {
+        this.taskList = taskList;
     }
 
     public LocalDateTime getCreatedOn() {
@@ -139,22 +145,6 @@ class Task {
 
     public void setCreatorId(String creatorId) {
         this.creatorId = creatorId;
-    }
-
-    public boolean isDone() {
-        return isDone;
-    }
-
-    public void setDone(boolean isDone) {
-        this.isDone = isDone;
-    }
-
-    public TaskList getTaskList() {
-        return taskList;
-    }
-
-    public void setTaskList(TaskList taskList) {
-        this.taskList = taskList;
     }
 
     public LocalDateTime getDeadline() {

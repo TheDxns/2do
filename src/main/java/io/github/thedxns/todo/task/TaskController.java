@@ -87,7 +87,7 @@ class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<?> saveTask(@Valid @RequestBody Task task) {
+    public ResponseEntity<?> saveTask(@Valid @RequestBody TaskDto task) {
         if (taskService.saveTask(task)) {
             return ResponseEntity.ok().build();
         } else {
@@ -96,9 +96,10 @@ class TaskController {
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<?> saveCustomListTask(@PathVariable Long id, @Valid @RequestBody Task task) {
-        task.setTaskList(taskListService.getTaskList(id));
-        if (taskService.saveTask(task)) {
+    public ResponseEntity<?> saveCustomListTask(@PathVariable Long id, @Valid @RequestBody TaskDto task) {
+        if(!taskService.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        } else if (taskService.saveCustomListTask(id, task)) {
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.internalServerError().build();
@@ -138,7 +139,7 @@ class TaskController {
         } else {
             final Task task = taskService.getTask(id);
             task.setTaskList(null);
-            task.setDone(true);
+            task.setStatus(TaskStatus.DONE);
             if (taskService.updateTask(id, task)) {
                 return ResponseEntity.noContent().build();
             } else {
@@ -153,7 +154,11 @@ class TaskController {
             return ResponseEntity.notFound().build();
         } else {
             final Task task = taskService.getTask(id);
-            task.setPrioritized(!task.isPrioritized());
+            if (task.getPriority().equals(TaskPriority.MINOR)) {
+                task.setPriority(TaskPriority.MAJOR);
+            } else {
+                task.setPriority(TaskPriority.MINOR);
+            }
             if (taskService.updateTask(id, task)) {
                 return ResponseEntity.noContent().build();
             } else {

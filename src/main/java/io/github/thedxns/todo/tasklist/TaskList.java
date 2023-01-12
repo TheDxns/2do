@@ -1,6 +1,10 @@
 package io.github.thedxns.todo.tasklist;
 
+import io.github.thedxns.todo.user.KeycloakId;
+import org.springframework.data.annotation.PersistenceConstructor;
+
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -15,23 +19,26 @@ public class TaskList {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
     @Column(length = 200)
     @NotBlank(message = "The task title must not be empty")
     private String title;
-
     @ElementCollection(targetClass=String.class)
     private List<String> users;
 
-    public void updateFrom(final TaskList source) {
-        this.title = source.title;
-        this.users = source.users;
-    }
+    @PersistenceConstructor
     public TaskList() {
-        
     }
 
-    public TaskList(String title, List<String> users) {
+    public TaskList(final TaskListDto dto) {
+        this.title = dto.getTitle();
+        this.users = dto.getUsers().stream().map(KeycloakId::getId).collect(Collectors.toList());
+    }
+    public void updateFromDto(final TaskListDto dto) {
+        this.title = dto.getTitle();
+        this.users = dto.getUsers().stream().map(Object::toString).collect(Collectors.toList());
+    }
+
+    public TaskList(final String title, final List<String> users) {
         this.title = title;
         this.users = users;
     }

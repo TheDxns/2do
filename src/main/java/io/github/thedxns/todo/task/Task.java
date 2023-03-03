@@ -1,13 +1,11 @@
 package io.github.thedxns.todo.task;
 
 import java.time.LocalDateTime;
-import java.util.stream.Collectors;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
 import io.github.thedxns.todo.tasklist.TaskList;
-import io.github.thedxns.todo.user.KeycloakId;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.annotation.PersistenceConstructor;
@@ -49,8 +47,7 @@ class Task {
         status = source.getStatus();
         deadline = source.getDeadline();
         responsible = source.getCreator().getName();
-        taskList = new TaskList(source.getTaskList().getTitle(), source.getTaskList().getUsers()
-                .stream().map(KeycloakId::getId).collect(Collectors.toList()));
+        taskList = source.getTaskList() != null ? new TaskList(source.getTaskList()) : null;
     }
     
     public void updateFrom(final Task source) {

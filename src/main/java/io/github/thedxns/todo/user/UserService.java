@@ -11,6 +11,10 @@ public class UserService {
         this.userController = userController;
     }
 
+    public UserDto getUserById(final KeycloakId id) {
+        return userController.getUser(id.getId());
+    }
+
     public KeycloakId getUserId(final String username) {
         return new KeycloakId(userController.getUserByUsername(username));
     }

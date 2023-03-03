@@ -1,7 +1,10 @@
 package io.github.thedxns.todo.task;
 
-import io.github.thedxns.todo.tasklist.TaskList;
+import io.github.thedxns.todo.tasklist.TaskListDto;
 import io.github.thedxns.todo.tasklist.TaskListService;
+import io.github.thedxns.todo.user.KeycloakId;
+import io.github.thedxns.todo.user.UserDto;
+import io.github.thedxns.todo.user.UserService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -14,10 +17,12 @@ import java.util.stream.Collectors;
 class TaskService {
 
     private final TaskListService taskListService;
+    private final UserService userService;
     private final TaskRepository taskRepository;
 
-    public TaskService(TaskListService taskListService, TaskRepository taskRepository) {
+    public TaskService(TaskListService taskListService, UserService userService, TaskRepository taskRepository) {
         this.taskListService = taskListService;
+        this.userService = userService;
         this.taskRepository = taskRepository;
     }
 
@@ -74,8 +79,13 @@ class TaskService {
             .filter(t -> !t.getStatus().equals(TaskStatus.DONE) && t.getTaskList() != null).collect(Collectors.toList());
     }
 
-    public boolean saveTask(final TaskDto taskData) {
-        taskRepository.save(new Task(taskData));
+    public boolean saveTask(final TaskRequest taskData) {
+        final TaskListDto taskList = taskListService.getTaskList(taskData.getTaskListId());
+
+        final UserDto creator = userService.getUserById(new KeycloakId(taskData.getCreatorId()));
+        final TaskDto task = new TaskDto(taskData.getTitle(), taskData.getDescription(), taskData.getPriority(),
+                taskData.getStatus(), creator, taskList, taskData.getDeadline());
+        taskRepository.save(new Task(task));
         return true;
     }
 
@@ -95,10 +105,8 @@ class TaskService {
         return true;
     }
 
-    public boolean saveCustomListTask(final Long taskListId, final TaskDto taskData) {
-        final Task task = new Task(taskData);
-        task.setTaskList(new TaskList(taskListService.getTaskList(taskListId)));
-        taskRepository.save(task);
+    public boolean saveCustomListTask(Long id, TaskDto task) {
+        //TODO: Finish this
         return true;
     }
 }

@@ -29,6 +29,19 @@ public class TaskDto {
         this.updatedOn = updatedOn;
     }
 
+    public TaskDto(String title, String description, TaskPriority priority, TaskStatus status, UserDto creator,
+                   TaskListDto taskList, LocalDateTime deadline) {
+        this.title = title;
+        this.description = description;
+        this.priority = priority;
+        this.status = status;
+        this.creator = creator;
+        this.taskList = taskList;
+        this.deadline = deadline;
+        this.createdOn = null;
+        this.updatedOn = null;
+    }
+
     public static TaskDto from(Task task) {
         return new TaskDto(task.getTitle(), task.getContent(), task.getPriority(), task.getStatus(),
                 new UserDto(task.getCreatorId(), task.getResponsible()), TaskListDto.from(task.getTaskList()),

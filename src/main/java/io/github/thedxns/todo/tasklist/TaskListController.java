@@ -50,7 +50,7 @@ class TaskListController {
     }
 
     @PostMapping
-    private ResponseEntity<?> saveTaskList(@Valid @RequestBody TaskList taskList) {
+    private ResponseEntity<?> saveTaskList(@Valid @RequestBody TaskListRequest taskList) {
         if (taskListService.saveTaskList(taskList)) {
             return ResponseEntity.ok().build();
         } else {

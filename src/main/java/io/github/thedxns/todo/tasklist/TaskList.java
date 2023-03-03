@@ -22,6 +22,9 @@ public class TaskList {
     @Column(length = 200)
     @NotBlank(message = "The task title must not be empty")
     private String title;
+    @Column(length = 200)
+    @NotBlank
+    private String ownerId;
     @ElementCollection(targetClass=String.class)
     private List<String> users;
 
@@ -31,16 +34,13 @@ public class TaskList {
 
     public TaskList(final TaskListDto dto) {
         this.title = dto.getTitle();
-        this.users = dto.getUsers().stream().map(KeycloakId::getId).collect(Collectors.toList());
+        this.ownerId = dto.getOwner().getId();
+        this.users = dto.getUsers() != null ? dto.getUsers().stream().map(KeycloakId::getId).collect(Collectors.toList()) : null;
     }
     public void updateFromDto(final TaskListDto dto) {
         this.title = dto.getTitle();
-        this.users = dto.getUsers().stream().map(Object::toString).collect(Collectors.toList());
-    }
-
-    public TaskList(final String title, final List<String> users) {
-        this.title = title;
-        this.users = users;
+        this.ownerId = dto.getOwner().getId();
+        this.users = dto.getUsers() != null ? dto.getUsers().stream().map(Object::toString).collect(Collectors.toList()) : null;
     }
 
     public Long getId() {
@@ -65,5 +65,13 @@ public class TaskList {
 
     public void setUsers(List<String> users) {
         this.users = users;
+    }
+
+    public String getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
     }
 }

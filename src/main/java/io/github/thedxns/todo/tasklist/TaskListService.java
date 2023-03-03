@@ -1,5 +1,6 @@
 package io.github.thedxns.todo.tasklist;
 
+import io.github.thedxns.todo.user.KeycloakId;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,8 +27,10 @@ public class TaskListService {
         return taskListRepository.findByUsers(username);
     }
 
-    boolean saveTaskList(final TaskList taskList) {
-        taskListRepository.save(taskList);
+    boolean saveTaskList(final TaskListRequest taskListRequest) {
+        final TaskListDto taskList = new TaskListDto(null, taskListRequest.getTitle(),
+                new KeycloakId(taskListRequest.getOwnerId()), null);
+        taskListRepository.save(new TaskList(taskList));
         return true;
     }
 

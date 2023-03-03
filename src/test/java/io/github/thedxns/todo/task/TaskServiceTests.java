@@ -46,7 +46,7 @@ public class TaskServiceTests {
 
     @Test
     @DisplayName("The context should not be null")
-	public void contextLoads() throws Exception {
+	public void contextLoads() {
 		Assertions.assertNotNull(taskService);
     }
 

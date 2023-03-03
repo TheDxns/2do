@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,17 +36,7 @@ public class UserController {
 
 	@GetMapping
 	private Object getAllUsers() {
-		final Keycloak keycloak = KeycloakBuilder.builder()
-            .serverUrl(keycloakServerUrl)
-            .grantType(OAuth2Constants.PASSWORD)
-            .realm(keycloakRealm)
-            .clientId("todo-client")
-            .username("serviceaccount")
-            .password("serviceaccount")
-            .resteasyClient(
-                new ResteasyClientBuilder()
-                    .connectionPoolSize(10).build()
-            ).build();
+        final Keycloak keycloak = initKeycloak();
 
         final RestTemplate restTemplate = new RestTemplate();
         final HttpHeaders headers = new HttpHeaders();
@@ -56,17 +47,7 @@ public class UserController {
 
     @GetMapping("/username")
 	private List<String> getAllUsersUsernames() {
-		final Keycloak keycloak = KeycloakBuilder.builder()
-            .serverUrl(keycloakServerUrl)
-            .grantType(OAuth2Constants.PASSWORD)
-            .realm(keycloakRealm)
-            .clientId("todo-client")
-            .username("serviceaccount")
-            .password("serviceaccount")
-            .resteasyClient(
-                new ResteasyClientBuilder()
-                    .connectionPoolSize(10).build()
-            ).build();
+        final Keycloak keycloak = initKeycloak();
 
         final RestTemplate restTemplate = new RestTemplate();
         final HttpHeaders headers = new HttpHeaders();
@@ -84,39 +65,29 @@ public class UserController {
 	}
 
     @GetMapping("/{id}")
-	private Object getUser(@PathVariable String id) {
-	final Keycloak keycloak = KeycloakBuilder.builder()
-        .serverUrl("http://localhost:8180/auth")
-        .grantType(OAuth2Constants.PASSWORD)
-        .realm("Todo")
-        .clientId("todo-client")
-        .username("serviceaccount")
-        .password("serviceaccount")
-        .resteasyClient(
-            new ResteasyClientBuilder()
-                .connectionPoolSize(10).build()
-        ).build();
+	public UserDto getUser(@PathVariable String id) {
+        final Keycloak keycloak = initKeycloak();
 
         final RestTemplate restTemplate = new RestTemplate();
         final HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + keycloak.tokenManager().getAccessToken().getToken());
         final HttpEntity<String> request = new HttpEntity<>(headers);
-        return restTemplate.exchange(URI.create(keycloakServerUrl + "/admin/realms/Todo/users/" + id), HttpMethod.GET, request, Object.class).getBody();			
-	}
+        final ResponseEntity<KeycloakUserResponse> response = restTemplate.exchange(
+                URI.create(keycloakServerUrl + "/admin/realms/Todo/users/" + id),
+                HttpMethod.GET, request, KeycloakUserResponse.class);
+
+        final KeycloakUserResponse user = response.getBody();
+
+        if (user != null) {
+            return new UserDto(id, user.getFirstName() + " " + user.getLastName());
+        } else {
+            throw new RuntimeException("User not found");
+        }
+    }
 
     @GetMapping("/id/{key}")
 	public String getUserByUsername(@PathVariable String key) {
-		final Keycloak keycloak = KeycloakBuilder.builder()
-            .serverUrl(keycloakServerUrl)
-            .grantType(OAuth2Constants.PASSWORD)
-            .realm(keycloakRealm)
-            .clientId("todo-client")
-            .username("serviceaccount")
-            .password("serviceaccount")
-            .resteasyClient(
-                new ResteasyClientBuilder()
-                    .connectionPoolSize(10).build()
-            ).build();
+        final Keycloak keycloak = initKeycloak();
 
         final RestTemplate restTemplate = new RestTemplate();
         final HttpHeaders headers = new HttpHeaders();
@@ -137,17 +108,7 @@ public class UserController {
 
     @GetMapping("/username/{key}")
     public String getUsername(@PathVariable String key) {
-		final Keycloak keycloak = KeycloakBuilder.builder()
-            .serverUrl(keycloakServerUrl)
-            .grantType(OAuth2Constants.PASSWORD)
-            .realm(keycloakRealm)
-            .clientId("todo-client")
-            .username("serviceaccount")
-            .password("serviceaccount")
-            .resteasyClient(
-                new ResteasyClientBuilder()
-                    .connectionPoolSize(10).build()
-            ).build();
+		final Keycloak keycloak = initKeycloak();
 
         final RestTemplate restTemplate = new RestTemplate();
         final HttpHeaders headers = new HttpHeaders();
@@ -163,7 +124,21 @@ public class UserController {
             id = userArray.getJSONObject(i).getString("id");
             users.put(id, username);
         }
-        return users.get(key);	
+        return users.get(key);
 	}
+
+    private Keycloak initKeycloak() {
+        return KeycloakBuilder.builder()
+                .serverUrl(keycloakServerUrl)
+                .grantType(OAuth2Constants.PASSWORD)
+                .realm(keycloakRealm)
+                .clientId("todo-client")
+                .username("serviceaccount")
+                .password("serviceaccount")
+                .resteasyClient(
+                        new ResteasyClientBuilder()
+                                .connectionPoolSize(10).build()
+                ).build();
+    }
 
 }

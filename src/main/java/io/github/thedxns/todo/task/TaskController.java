@@ -87,7 +87,7 @@ class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<?> saveTask(@Valid @RequestBody TaskDto task) {
+    public ResponseEntity<?> saveTask(@Valid @RequestBody TaskRequest task) {
         if (taskService.saveTask(task)) {
             return ResponseEntity.ok().build();
         } else {

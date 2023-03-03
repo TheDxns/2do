@@ -7,6 +7,7 @@ import javax.validation.Valid;
 
 import io.github.thedxns.todo.user.KeycloakId;
 import io.github.thedxns.todo.user.UserService;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,7 +51,7 @@ class TaskListController {
     }
 
     @PostMapping
-    private ResponseEntity<?> saveTaskList(@Valid @RequestBody TaskList taskList) {
+    private ResponseEntity<?> saveTaskList(@Valid @RequestBody TaskListRequest taskList) {
         if (taskListService.saveTaskList(taskList)) {
             return ResponseEntity.ok().build();
         } else {

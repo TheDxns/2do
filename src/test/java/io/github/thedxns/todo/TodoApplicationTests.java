@@ -14,7 +14,7 @@ class TodoApplicationTests {
 
     @Test
     @DisplayName("The context should not be null")
-    void contextLoads() throws Exception {
+    void contextLoads() {
 		Assertions.assertNotNull(todoApplication);
     }
 

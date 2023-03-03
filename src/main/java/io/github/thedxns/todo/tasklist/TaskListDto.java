@@ -7,21 +7,24 @@ import java.util.stream.Collectors;
 
 public class TaskListDto {
 
-    private final TaskListId taskListId;
+    private final Long taskListId;
     private final String title;
+    private final KeycloakId owner;
     private final List<KeycloakId> users;
 
-    public TaskListDto(TaskListId taskListId, String title, List<KeycloakId> users) {
+    public TaskListDto(Long taskListId, String title, KeycloakId owner, List<KeycloakId> users) {
         this.taskListId = taskListId;
         this.title = title;
+        this.owner = owner;
         this.users = users;
     }
 
     public static TaskListDto from(TaskList taskList) {
-        return new TaskListDto(new TaskListId(taskList.getId()), taskList.getTitle(), taskList.getUsers().stream().map(KeycloakId::new).collect(Collectors.toList()));
+        return new TaskListDto(taskList.getId(), taskList.getTitle(), new KeycloakId(taskList.getOwnerId()),
+                taskList.getUsers().stream().map(KeycloakId::new).collect(Collectors.toList()));
     }
 
-    public TaskListId getTaskListId() {
+    public Long getTaskListId() {
         return taskListId;
     }
 
@@ -33,4 +36,7 @@ public class TaskListDto {
         return users;
     }
 
+    public KeycloakId getOwner() {
+        return owner;
+    }
 }

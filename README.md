@@ -7,11 +7,11 @@
 - Task ownership
 - Task list sharing
 - Defining time frames for tasks
-- Notification system
+- Reminders
 
 # Used technologies:
 - Spring Boot
 - Keycloak
+- RabbitMQ
 - Vue.js
 - Vuetify
-

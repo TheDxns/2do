@@ -111,7 +111,7 @@ class TaskController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateTask(@PathVariable Long id, @RequestBody @Valid Task task) {
+    public ResponseEntity<?> updateTask(@PathVariable Long id, @RequestBody @Valid TaskRequest task) {
         if (!taskService.existsById(id)) {
             return ResponseEntity.notFound().build();
         } else {

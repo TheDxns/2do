@@ -2,6 +2,7 @@ package io.github.thedxns.todo.tasklist;
 
 import io.github.thedxns.todo.user.KeycloakId;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,8 +21,11 @@ public class TaskListDto {
     }
 
     public static TaskListDto from(TaskList taskList) {
-        return new TaskListDto(taskList.getId(), taskList.getTitle(), new KeycloakId(taskList.getOwnerId()),
-                taskList.getUsers().stream().map(KeycloakId::new).collect(Collectors.toList()));
+        if (taskList != null) {
+            return new TaskListDto(taskList.getId(), taskList.getTitle(), new KeycloakId(taskList.getOwnerId()),
+                    taskList.getUsers().stream().map(KeycloakId::new).collect(Collectors.toList()));
+        }
+        return null;
     }
 
     public Long getTaskListId() {

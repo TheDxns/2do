@@ -46,9 +46,9 @@ public class TaskListService {
     }
 
     boolean updateTaskList(final Long id, final TaskListRequest taskListRequest) {
-        final TaskListDto taskList = new TaskListDto(id, taskListRequest.getTitle(),
+        final TaskListDto updatedTaskList = new TaskListDto(id, taskListRequest.getTitle(),
                 new KeycloakId(taskListRequest.getOwnerId()), null);
-        taskListRepository.save(new TaskList(taskList));
+        taskListRepository.save(new TaskList(updatedTaskList));
         return true;
     }
 

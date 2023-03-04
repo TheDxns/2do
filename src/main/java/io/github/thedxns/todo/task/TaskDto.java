@@ -65,6 +65,10 @@ public class TaskDto {
                 task.getDeadline(), task.getCreatedOn(), task.getUpdatedOn());
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public String getTitle() {
         return title;
     }

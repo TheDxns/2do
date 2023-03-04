@@ -34,6 +34,7 @@ public class TaskList {
     }
 
     public TaskList(final TaskListDto dto) {
+        this.id = dto.getTaskListId();
         this.title = dto.getTitle();
         this.ownerId = dto.getOwner().getId();
         this.users = dto.getUsers() != null ? dto.getUsers().stream().map(KeycloakId::getId).collect(Collectors.toList()) : null;

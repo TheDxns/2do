@@ -100,16 +100,18 @@ class TaskService {
         return taskRepository.existsById(id);
     }
 
-    public boolean updateTask(final Long id, final Task task) {
-        task.setId(id);
-        task.updateFrom(task);
-        taskRepository.save(task);
+    public boolean updateTask(final Long id, final TaskRequest taskData) {
+        final TaskListDto taskList = taskListService.getTaskList(taskData.getTaskListId());
+        final UserDto creator = userService.getUserById(new KeycloakId(taskData.getCreatorId()));
+        final TaskDto task = new TaskDto(id, taskData.getTitle(), taskData.getDescription(), taskData.getPriority(),
+                taskData.getStatus(), creator, taskList, taskData.getDeadline());
+
+        taskRepository.save(new Task(task));
         return true;
     }
 
     public boolean saveCustomListTask(final Long id, final TaskRequest taskData) {
         final TaskListDto taskList = taskListService.getTaskList(taskData.getTaskListId());
-
         final UserDto creator = userService.getUserById(new KeycloakId(taskData.getCreatorId()));
         final TaskDto task = new TaskDto(id, taskData.getTitle(), taskData.getDescription(), taskData.getPriority(),
                 taskData.getStatus(), creator, taskList, taskData.getDeadline());

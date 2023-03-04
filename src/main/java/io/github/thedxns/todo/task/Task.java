@@ -39,6 +39,7 @@ class Task {
     }
 
     public Task(TaskDto source) {
+        id = source.getId();
         title = source.getTitle();
         content = source.getDescription();
         createdOn = source.getCreatedOn();
@@ -49,18 +50,6 @@ class Task {
         deadline = source.getDeadline();
         responsible = source.getCreator().getName();
         taskList = source.getTaskList() != null ? new TaskList(source.getTaskList()) : null;
-    }
-    
-    public void updateFrom(final Task source) {
-        title = source.title;
-        content = source.content;
-        createdOn = source.createdOn;
-        updatedOn = source.updatedOn;
-        priority = source.priority;
-        creatorId = source.creatorId;
-        status = source.status;
-        deadline = source.deadline;
-        responsible = source.responsible;
     }
 
     @PrePersist

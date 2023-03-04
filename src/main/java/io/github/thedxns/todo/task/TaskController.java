@@ -17,69 +17,60 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.github.thedxns.todo.tasklist.TaskListService;
-
 @RestController
 @RequestMapping("/api/tasks")
 class TaskController {
 
     private final TaskService taskService;
-    private final TaskListService taskListService;
 
     @Autowired
-    public TaskController(final TaskService taskService, final TaskListService taskListService) {
+    public TaskController(final TaskService taskService) {
         this.taskService = taskService;
-        this.taskListService = taskListService;
     }
     
     @GetMapping(params = {"!sort", "!page", "!size"})
-    public ResponseEntity<List<Task>> getTasks() {
+    public ResponseEntity<?> getTasks() {
         return ResponseEntity.ok(taskService.getAllTasks());
     }
 
-    @GetMapping
-    public ResponseEntity<?> getTasks(Pageable page) {
-        return ResponseEntity.ok(taskService.getAllTasks(page));
-    }
-
     @GetMapping("/list/{id}")
-    public ResponseEntity<List<Task>> getTasksFromList(@PathVariable Long id) {
+    public ResponseEntity<?> getTasksFromList(@PathVariable Long id) {
         return ResponseEntity.ok(taskService.getTasksByList(id));
     }
 
     @GetMapping("/user/{creatorId}")
-    public ResponseEntity<List<Task>> getTasksFromUser(@PathVariable String creatorId) {
+    public ResponseEntity<?> getTasksFromUser(@PathVariable String creatorId) {
         return ResponseEntity.ok(taskService.getAllByCreator(creatorId));
     }
 
     @GetMapping("/unfinished/user/{creatorId}")
-    public ResponseEntity<List<Task>> getUnfinishedTasksFromUser(@PathVariable String creatorId) {
+    public ResponseEntity<?> getUnfinishedTasksFromUser(@PathVariable String creatorId) {
         return ResponseEntity.ok(taskService.getUnfinishedByCreator(creatorId));
     }
     
     @GetMapping("/done/user/{creatorId}")
-    public ResponseEntity<List<Task>> getDoneTasksFromUser(@PathVariable String creatorId) {
+    public ResponseEntity<?> getDoneTasksFromUser(@PathVariable String creatorId) {
         return ResponseEntity.ok(taskService.getDoneByCreator(creatorId));
     }
 
     @GetMapping("/important/user/{creatorId}")
-    public ResponseEntity<List<Task>> getImportantTasksFromUser(@PathVariable String creatorId) {
+    public ResponseEntity<?> getImportantTasksFromUser(@PathVariable String creatorId) {
         return ResponseEntity.ok(taskService.getImportantByCreator(creatorId));
     }
 
     @GetMapping("/unfinished/custom/{listId}")
-    public ResponseEntity<List<Task>> getCustomTasks(@PathVariable Long listId) {
+    public ResponseEntity<?> getCustomTasks(@PathVariable Long listId) {
         return ResponseEntity.ok(taskService.getCustom(listId));
     }
 
     @GetMapping("search/{keyword}")
-    public ResponseEntity<?> getTaskById(@PathVariable String keyword) {
+    public ResponseEntity<?> getTasksByKeyword(@PathVariable String keyword) {
         return ResponseEntity.ok(taskService.getTasksByKeyword(keyword));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getTaskById(@PathVariable Long id) {
-        if(!taskService.existsById(id)) {
+        if (!taskService.existsById(id)) {
             return ResponseEntity.notFound().build();
         } else {
             return ResponseEntity.ok(taskService.getTask(id));
@@ -96,8 +87,8 @@ class TaskController {
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<?> saveCustomListTask(@PathVariable Long id, @Valid @RequestBody TaskDto task) {
-        if(!taskService.existsById(id)) {
+    public ResponseEntity<?> saveCustomListTask(@PathVariable Long id, @Valid @RequestBody TaskRequest task) {
+        if (!taskService.existsById(id)) {
             return ResponseEntity.notFound().build();
         } else if (taskService.saveCustomListTask(id, task)) {
             return ResponseEntity.ok().build();
@@ -108,7 +99,7 @@ class TaskController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteTask(@PathVariable Long id) {
-        if(!taskService.existsById(id)) {
+        if (!taskService.existsById(id)) {
             return ResponseEntity.notFound().build();
         } else {
             if (taskService.deleteTask(id)) {
@@ -120,7 +111,7 @@ class TaskController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateTask(@PathVariable Long id, @RequestBody @Valid Task task) {
+    public ResponseEntity<?> updateTask(@PathVariable Long id, @RequestBody @Valid TaskRequest task) {
         if (!taskService.existsById(id)) {
             return ResponseEntity.notFound().build();
         } else {
@@ -134,13 +125,10 @@ class TaskController {
 
     @PatchMapping("/finish/{id}")
     public ResponseEntity<?> finishTask(@PathVariable Long id) {
-        if(!taskService.existsById(id)) {
+        if (!taskService.existsById(id)) {
             return ResponseEntity.notFound().build();
         } else {
-            final Task task = taskService.getTask(id);
-            task.setTaskList(null);
-            task.setStatus(TaskStatus.DONE);
-            if (taskService.updateTask(id, task)) {
+            if (taskService.finishTask(id)) {
                 return ResponseEntity.noContent().build();
             } else {
                 return ResponseEntity.internalServerError().build(); 
@@ -153,13 +141,7 @@ class TaskController {
         if (!taskService.existsById(id)) {
             return ResponseEntity.notFound().build();
         } else {
-            final Task task = taskService.getTask(id);
-            if (task.getPriority().equals(TaskPriority.MINOR)) {
-                task.setPriority(TaskPriority.MAJOR);
-            } else {
-                task.setPriority(TaskPriority.MINOR);
-            }
-            if (taskService.updateTask(id, task)) {
+            if (taskService.switchPriority(id)) {
                 return ResponseEntity.noContent().build();
             } else {
                 return ResponseEntity.internalServerError().build(); 

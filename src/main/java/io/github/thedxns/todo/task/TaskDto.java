@@ -6,6 +6,7 @@ import io.github.thedxns.todo.user.UserDto;
 import java.time.LocalDateTime;
 
 public class TaskDto {
+    private final Long id;
     private final String title;
     private final String description;
     private final TaskPriority priority;
@@ -16,8 +17,9 @@ public class TaskDto {
     private final LocalDateTime createdOn;
     private final LocalDateTime updatedOn;
 
-    public TaskDto(String title, String description, TaskPriority priority, TaskStatus status, UserDto creator,
+    public TaskDto(Long id, String title, String description, TaskPriority priority, TaskStatus status, UserDto creator,
                    TaskListDto taskList, LocalDateTime deadline, LocalDateTime createdOn, LocalDateTime updatedOn) {
+        this.id = id;
         this.title = title;
         this.description = description;
         this.priority = priority;
@@ -31,6 +33,21 @@ public class TaskDto {
 
     public TaskDto(String title, String description, TaskPriority priority, TaskStatus status, UserDto creator,
                    TaskListDto taskList, LocalDateTime deadline) {
+        this.id = null;
+        this.title = title;
+        this.description = description;
+        this.priority = priority;
+        this.status = status;
+        this.creator = creator;
+        this.taskList = taskList;
+        this.deadline = deadline;
+        this.createdOn = null;
+        this.updatedOn = null;
+    }
+
+    public TaskDto(Long id, String title, String description, TaskPriority priority, TaskStatus status, UserDto creator,
+                   TaskListDto taskList, LocalDateTime deadline) {
+        this.id = id;
         this.title = title;
         this.description = description;
         this.priority = priority;
@@ -43,9 +60,13 @@ public class TaskDto {
     }
 
     public static TaskDto from(Task task) {
-        return new TaskDto(task.getTitle(), task.getContent(), task.getPriority(), task.getStatus(),
+        return new TaskDto(task.getId(), task.getTitle(), task.getContent(), task.getPriority(), task.getStatus(),
                 new UserDto(task.getCreatorId(), task.getResponsible()), TaskListDto.from(task.getTaskList()),
                 task.getDeadline(), task.getCreatedOn(), task.getUpdatedOn());
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getTitle() {

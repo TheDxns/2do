@@ -3,7 +3,7 @@ spring:
     enabled: true
     path: /console
     settings.web-allow-others: true
-  datasource.url: jdbc:h2:file:/C:/Workspace/dbs/2do/testdb
+  datasource.url: jdbc:h2:mem:dev
   
 management:
   endpoints:

@@ -6,11 +6,11 @@ import io.github.thedxns.todo.user.KeycloakId;
 import io.github.thedxns.todo.user.UserDto;
 import io.github.thedxns.todo.user.UserService;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -27,57 +27,58 @@ class TaskService {
         this.taskRepository = taskRepository;
     }
 
-    public List<Task> getAllTasks() {
-        return taskRepository.findAll();
+    public List<TaskDto> getAllTasks() {
+        return taskRepository.findAll().stream().map(TaskDto::from).collect(Collectors.toList());
     }
 
-    public List<Task> getAllTasks(final Pageable page) {
-        return taskRepository.findAll(page).getContent();
-    }
-
-    public List<Task> getTasksByKeyword(final String keyword) {
+    public List<TaskDto> getTasksByKeyword(final String keyword) {
         final List<Task> tasks = taskRepository.findByTitleContainingIgnoreCase(keyword);
         tasks.addAll(taskRepository.findByContentContainingIgnoreCase(keyword));
         final Set<Task> set = new LinkedHashSet<>(tasks);
         tasks.clear();
         tasks.addAll(set);
-        return tasks;
+        return tasks.stream().map(TaskDto::from).collect(Collectors.toList());
     }
     
-    public Task getTask(final Long id) {
-        return taskRepository.findById(id).get();
+    public TaskDto getTask(final Long id) {
+        final Optional<Task> task = taskRepository.findById(id);
+        return task.map(TaskDto::from).orElse(null);
     }
 
-    public List<Task> getTasksByList(final Long id) {
-        return taskRepository.findByTaskListId(id);
+    public List<TaskDto> getTasksByList(final Long id) {
+        return taskRepository.findByTaskListId(id).stream().map(TaskDto::from).collect(Collectors.toList());
     } 
 
-    public List<Task> getAllByCreator(final String creatorId) {
-        return taskRepository.findByCreatorId(creatorId);
+    public List<TaskDto> getAllByCreator(final String creatorId) {
+        return taskRepository.findByCreatorId(creatorId).stream().map(TaskDto::from).collect(Collectors.toList());
     }
 
-    public List<Task> getUnfinishedByCreator(final String creatorId) {
-        List<Task> allTasks = taskRepository.findByCreatorId(creatorId);
+    public List<TaskDto> getUnfinishedByCreator(final String creatorId) {
+        final List<Task> allTasks = taskRepository.findByCreatorId(creatorId);
         return allTasks.stream()
-            .filter(t -> !t.getStatus().equals(TaskStatus.DONE) && t.getTaskList() == null).collect(Collectors.toList());
+            .filter(t -> !t.getStatus().equals(TaskStatus.DONE) && t.getTaskList() == null).map(TaskDto::from)
+                .collect(Collectors.toList());
     }
 
-    public List<Task> getDoneByCreator(final String creatorId) {
-        List<Task> allTasks = taskRepository.findByCreatorId(creatorId);
+    public List<TaskDto> getDoneByCreator(final String creatorId) {
+        final List<Task> allTasks = taskRepository.findByCreatorId(creatorId);
         return allTasks.stream()
-            .filter(t -> t.getStatus().equals(TaskStatus.DONE) && t.getTaskList() == null).collect(Collectors.toList());
+            .filter(t -> t.getStatus().equals(TaskStatus.DONE) && t.getTaskList() == null).map(TaskDto::from)
+                .collect(Collectors.toList());
     }
 
-    public List<Task> getImportantByCreator(final String creatorId) {
-        List<Task> allTasks = taskRepository.findByCreatorId(creatorId);
+    public List<TaskDto> getImportantByCreator(final String creatorId) {
+        final List<Task> allTasks = taskRepository.findByCreatorId(creatorId);
         return allTasks.stream()
-            .filter(t -> !t.getStatus().equals(TaskStatus.DONE) && t.getPriority().equals(TaskPriority.MAJOR)).collect(Collectors.toList());
+            .filter(t -> !t.getStatus().equals(TaskStatus.DONE) && t.getPriority().equals(TaskPriority.MAJOR))
+                .map(TaskDto::from).collect(Collectors.toList());
     }
 
-    public List<Task> getCustom(final Long listId) {
-        List<Task> allTasks = taskRepository.findByTaskListId(listId);
+    public List<TaskDto> getCustom(final Long listId) {
+        final List<Task> allTasks = taskRepository.findByTaskListId(listId);
         return allTasks.stream()
-            .filter(t -> !t.getStatus().equals(TaskStatus.DONE) && t.getTaskList() != null).collect(Collectors.toList());
+            .filter(t -> !t.getStatus().equals(TaskStatus.DONE) && t.getTaskList() != null).map(TaskDto::from)
+                .collect(Collectors.toList());
     }
 
     public boolean saveTask(final TaskRequest taskData) {
@@ -106,8 +107,40 @@ class TaskService {
         return true;
     }
 
-    public boolean saveCustomListTask(Long id, TaskDto task) {
-        //TODO: Finish this
+    public boolean saveCustomListTask(final Long id, final TaskRequest taskData) {
+        final TaskListDto taskList = taskListService.getTaskList(taskData.getTaskListId());
+
+        final UserDto creator = userService.getUserById(new KeycloakId(taskData.getCreatorId()));
+        final TaskDto task = new TaskDto(id, taskData.getTitle(), taskData.getDescription(), taskData.getPriority(),
+                taskData.getStatus(), creator, taskList, taskData.getDeadline());
+        taskRepository.save(new Task(task));
         return true;
+    }
+
+    public boolean switchPriority(final Long id) {
+        final Optional<Task> task = taskRepository.findById(id);
+        if (task.isPresent()) {
+            if (task.get().getPriority().equals(TaskPriority.MINOR)) {
+                task.get().setPriority(TaskPriority.MAJOR);
+            } else {
+                task.get().setPriority(TaskPriority.MINOR);
+            }
+            taskRepository.save(task.get());
+            return true;
+        } else {
+            throw new RuntimeException("Task with given ID does not exist.");
+        }
+    }
+
+    public boolean finishTask(final Long id) {
+        final Optional<Task> task = taskRepository.findById(id);
+        if (task.isPresent()) {
+            task.get().setTaskList(null);
+            task.get().setStatus(TaskStatus.DONE);
+            taskRepository.save(task.get());
+            return true;
+        } else {
+            throw new RuntimeException("Task with given ID does not exist.");
+        }
     }
 }

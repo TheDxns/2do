@@ -3,8 +3,10 @@ package io.github.thedxns.todo.tasklist;
 import io.github.thedxns.todo.user.KeycloakId;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TaskListService {
@@ -14,8 +16,8 @@ public class TaskListService {
         this.taskListRepository = taskListRepository;
     }
 
-    List<TaskList> getAllTaskLists() {
-        return taskListRepository.findAll();
+    List<TaskListDto> getAllTaskLists() {
+        return taskListRepository.findAll().stream().map(TaskListDto::from).collect(Collectors.toList());
     }
     
     public TaskListDto getTaskList(final Long id) {
@@ -23,8 +25,8 @@ public class TaskListService {
         return taskList.map(TaskListDto::from).orElse(null);
     }
 
-    List<TaskList> getAllByUser(final String username) {
-        return taskListRepository.findByUsers(username);
+    List<TaskListDto> getAllByUser(final String username) {
+        return taskListRepository.findByUsers(username).stream().map(TaskListDto::from).collect(Collectors.toList());
     }
 
     boolean saveTaskList(final TaskListRequest taskListRequest) {
@@ -43,11 +45,30 @@ public class TaskListService {
         return taskListRepository.existsById(id);
     }
 
-    boolean updateTaskList(final Long id, final TaskListDto taskList) {
-        final TaskList updatedTaskList = new TaskList();
-        updatedTaskList.setId(id);
-        updatedTaskList.updateFromDto(taskList);
-        taskListRepository.save(updatedTaskList);
+    boolean updateTaskList(final Long id, final TaskListRequest taskListRequest) {
+        final TaskListDto taskList = new TaskListDto(id, taskListRequest.getTitle(),
+                new KeycloakId(taskListRequest.getOwnerId()), null);
+        taskListRepository.save(new TaskList(taskList));
+        return true;
+    }
+
+    public boolean grantAccessToUser(final Long taskListId, final KeycloakId userId) {
+        final TaskListDto taskListData = getTaskList(taskListId);
+        final TaskList taskList = new TaskList(taskListData);
+        final List<String> users = taskList.getUsers();
+        users.add(userId.getId());
+        taskList.setUsers(users);
+        taskListRepository.save(taskList);
+        return true;
+    }
+
+    public boolean removeAccessOfUser(final Long taskListId, final KeycloakId userId) {
+        final TaskListDto taskListData = getTaskList(taskListId);
+        final TaskList taskList = new TaskList(taskListData);
+        final List<String> users = taskList.getUsers();
+        users.remove(userId.getId());
+        taskList.setUsers(users);
+        taskListRepository.save(taskList);
         return true;
     }
 }

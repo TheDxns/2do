@@ -19,15 +19,9 @@ public class TaskControllerTests {
     @Mock
 	private TaskController mockTaskController;
 
-	@Mock
-	private TaskListService mockTaskListService;
-
-	@Mock
-	private TaskService mockTaskService;
-
 	@Test
     @DisplayName("The context should not be null")
-	public void contextLoads() throws Exception {
+	public void contextLoads() {
 		Assertions.assertNotNull(mockTaskController);
     }
     
@@ -36,7 +30,7 @@ public class TaskControllerTests {
 	public void deletePostWhenNoPostFoundReturns404Response() {
 		TaskService mockTaskService = mock(TaskService.class);
 		when(mockTaskService.existsById((long) 1)).thenReturn(false);
-		TaskController testPostController = new TaskController(mockTaskService, mockTaskListService);
+		TaskController testPostController = new TaskController(mockTaskService);
 		Assertions.assertEquals(ResponseEntity.notFound().build(), testPostController.deleteTask((long) 1));
 	}
 
@@ -45,7 +39,7 @@ public class TaskControllerTests {
 	public void updatePostWhenNoPostFoundReturns404Response() {
 		TaskService mockTaskService = mock(TaskService.class);
 		when(mockTaskService.existsById((long)1)).thenReturn(false);
-		TaskController testTaskController = new TaskController(mockTaskService, mockTaskListService);
+		TaskController testTaskController = new TaskController(mockTaskService);
 		Assertions.assertEquals(ResponseEntity.notFound().build(), testTaskController.updateTask((long) 1, any(Task.class)));
 	}
 
@@ -55,7 +49,7 @@ public class TaskControllerTests {
 		TaskService mockTaskService = mock(TaskService.class);
 		when(mockTaskService.existsById((long) 1)).thenReturn(true);
 		when(mockTaskService.deleteTask((long) 1)).thenReturn(false);
-		TaskController testTaskController = new TaskController(mockTaskService, mockTaskListService);
+		TaskController testTaskController = new TaskController(mockTaskService);
 		Assertions.assertEquals(ResponseEntity.internalServerError().build(), testTaskController.deleteTask((long) 1));
 	}
 
@@ -65,7 +59,7 @@ public class TaskControllerTests {
 		TaskService mockTaskService = mock(TaskService.class);
 		when(mockTaskService.existsById((long) 1)).thenReturn(true);
 		when(mockTaskService.updateTask((long) 1, new Task())).thenReturn(false);
-		TaskController testPostController = new TaskController(mockTaskService, mockTaskListService);
+		TaskController testPostController = new TaskController(mockTaskService);
 		Assertions.assertEquals(ResponseEntity.internalServerError().build(), testPostController.updateTask((long) 1, any(Task.class)));
 	}
 
@@ -75,7 +69,7 @@ public class TaskControllerTests {
 		TaskService mockTaskService = mock(TaskService.class);
 		when(mockTaskService.existsById((long) 1)).thenReturn(true);
 		when(mockTaskService.deleteTask((long) 1)).thenReturn(true);
-		TaskController testTaskController = new TaskController(mockTaskService, mockTaskListService);
+		TaskController testTaskController = new TaskController(mockTaskService);
 		Assertions.assertEquals(ResponseEntity.ok().build(), testTaskController.deleteTask((long) 1));
 	}
 
@@ -85,7 +79,7 @@ public class TaskControllerTests {
 		TaskService mockTaskService = mock(TaskService.class);
 		when(mockTaskService.existsById((long) 1)).thenReturn(true);
 		when(mockTaskService.updateTask((long) 1, new Task())).thenReturn(true);
-		TaskController testTaskController = new TaskController(mockTaskService, mockTaskListService);
+		TaskController testTaskController = new TaskController(mockTaskService);
 		Assertions.assertEquals(ResponseEntity.internalServerError().build(), testTaskController.updateTask((long) 1, any(Task.class)));
 	}
 }

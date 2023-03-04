@@ -32,7 +32,7 @@ class TaskListController {
     }
     
     @GetMapping()
-    private ResponseEntity<List<TaskList>> getTaskLists() {
+    private ResponseEntity<?> getTaskLists() {
         return ResponseEntity.ok(taskListService.getAllTaskLists());
     }
 
@@ -46,7 +46,7 @@ class TaskListController {
     }
 
     @GetMapping("/user/{username}")
-    private ResponseEntity<List<TaskList>> getTaskListsByUser(@PathVariable String username) {
+    private ResponseEntity<?> getTaskListsByUser(@PathVariable String username) {
         return ResponseEntity.ok(taskListService.getAllByUser(username));
     }
 
@@ -73,7 +73,7 @@ class TaskListController {
     }
 
     @PutMapping("/{id}")
-    private ResponseEntity<?> updateTaskList(@PathVariable Long id, @RequestBody @Valid TaskListDto taskList) {
+    private ResponseEntity<?> updateTaskList(@PathVariable Long id, @RequestBody @Valid TaskListRequest taskList) {
         if (!taskListService.existsById(id)) {
             return ResponseEntity.notFound().build();
         } else {
@@ -85,34 +85,36 @@ class TaskListController {
         }
     }
 
-    @PatchMapping("/access/{id}/{username}")
-    private ResponseEntity<?> grantAccessToUser(@PathVariable Long id, @PathVariable String username) {
+    @PatchMapping("/access/{taskListId}/{username}")
+    private ResponseEntity<?> grantAccessToUser(@PathVariable Long taskListId, @PathVariable String username) {
         final KeycloakId userId = userService.getUserId(username);
-        final TaskListDto taskList = taskListService.getTaskList(id);
-        final List<KeycloakId> users = taskList.getUsers();
-        users.add(userId);
-        if (taskListService.updateTaskList(id, taskList)) {
-            return ResponseEntity.noContent().build();
+        if (!taskListService.existsById(taskListId)) {
+            return ResponseEntity.notFound().build();
         } else {
-            return ResponseEntity.internalServerError().build(); 
+            if (taskListService.grantAccessToUser(taskListId, userId)) {
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.internalServerError().build();
+            }
         }
     }
 
-    @PatchMapping("/access/remove/{id}/{username}")
-    private ResponseEntity<?> removeAccessOfUser(@PathVariable Long id, @PathVariable String username) {
+    @PatchMapping("/access/remove/{taskListId}/{username}")
+    private ResponseEntity<?> removeAccessOfUser(@PathVariable Long taskListId, @PathVariable String username) {
         final KeycloakId userId = userService.getUserId(username);
-        final TaskListDto taskList = taskListService.getTaskList(id);
-        final List<KeycloakId> users = taskList.getUsers();
-        users.remove(userId);
-        if (taskListService.updateTaskList(id, taskList)) {
-            return ResponseEntity.noContent().build();
+        if (!taskListService.existsById(taskListId)) {
+            return ResponseEntity.notFound().build();
         } else {
-            return ResponseEntity.internalServerError().build(); 
+            if (taskListService.removeAccessOfUser(taskListId, userId)) {
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.internalServerError().build();
+            }
         }
     }
 
     @GetMapping("/access/{id}")
-    private ResponseEntity<List<String>> getPermittedUsers(@PathVariable Long id) {
+    private ResponseEntity<?> getPermittedUsers(@PathVariable Long id) {
         final TaskListDto taskList = taskListService.getTaskList(id);
         final List<KeycloakId> users = taskList.getUsers();
         final List<String> usernames = new ArrayList<>();

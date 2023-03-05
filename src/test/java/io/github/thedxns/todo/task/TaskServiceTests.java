@@ -1,22 +1,53 @@
 package io.github.thedxns.todo.task;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Random;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import io.github.thedxns.todo.tasklist.TaskListDto;
+import io.github.thedxns.todo.tasklist.TaskListService;
+import io.github.thedxns.todo.user.KeycloakId;
+import io.github.thedxns.todo.user.UserDto;
+import io.github.thedxns.todo.user.UserService;
+import io.github.thedxns.todo.user.UserTestBuilder;
+import org.junit.jupiter.api.*;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.MockitoAnnotations;
 
-@SpringBootTest
 public class TaskServiceTests {
+
     @Mock
-	private TaskService taskService;
+    private TaskListService taskListServiceMock;
     @Mock
-    private TaskRepository taskRepository;
+    private UserService userServiceMock;
+    @Mock
+    private TaskRepository taskRepositoryMock;
+
+    private TaskService taskService;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        this.taskService = new TaskService(taskListServiceMock, userServiceMock, taskRepositoryMock);
+    }
+
+    private TaskDto prepareTestTask() {
+        final TaskListDto taskList = new TaskListDto(1L, "Test", new KeycloakId("123"), Collections.emptyList());
+        return new TaskTestBuilder().id(1L).taskList(taskList).title("Test").description("Test task")
+                .priority(TaskPriority.MINOR).status(TaskStatus.WAITING).creator(prepareTestUser()).deadline(LocalDateTime.now())
+                .createdOn(LocalDateTime.now()).updatedOn(null).build();
+    }
+
+    private UserDto prepareTestUser() {
+        return new UserTestBuilder().name("John Doe").keycloakId("123").build();
+    }
 
     public LocalDateTime getTestDate() {
         return LocalDateTime.parse("2019-05-08T11:33:08.863");
@@ -30,7 +61,7 @@ public class TaskServiceTests {
         task1.setPriority(TaskPriority.MAJOR);
         task1.setStatus(TaskStatus.WAITING);
         task1.setCreatedOn(getTestDate());
-        doReturn(task1).when(taskRepository).getById((long) 1);
+        doReturn(task1).when(taskRepositoryMock).getById((long) 1);
     }
 
     public static String generateRandomString(int length) {
@@ -45,21 +76,70 @@ public class TaskServiceTests {
 	}
 
     @Test
-    @DisplayName("The context should not be null")
-	public void contextLoads() {
-		Assertions.assertNotNull(taskService);
+    public void shouldReturnAllTasksFromRepository() {
+        // Given
+        final Task firstTask = new Task(prepareTestTask());
+        final Task secondTask = new Task(prepareTestTask());
+        final Task thirdTask = new Task(prepareTestTask());
+        given(taskRepositoryMock.findAll()).willReturn(Arrays.asList(firstTask, secondTask, thirdTask));
+
+        // When
+        // Then
+        assertThat(taskService.getAllTasks()).hasSize(3);
     }
 
     @Test
-    @DisplayName("Successful creation of a task entity")
-    public void createPostEntity() {
-        setUpTestTask();
-        final TaskDto newTask = TaskDto.from(taskRepository.getById((long) 1));
-        Assertions.assertEquals("A new test task", newTask.getTitle());
-        Assertions.assertEquals("<h1>This task was created for unit testing purpose.</h1>", newTask.getDescription());
-        Assertions.assertEquals("user1234", newTask.getCreator().getKeycloakId());
-        Assertions.assertEquals(TaskPriority.MAJOR, newTask.getPriority());
-        Assertions.assertEquals(TaskStatus.WAITING, newTask.getStatus());
-        Assertions.assertEquals(getTestDate(), newTask.getCreatedOn());
+    @Disabled
+    //TODO: Need to finish test
+    public void shouldSwitchTaskPriorityIfTaskExistsAndPriorityIsMinor() {
+        // Given
+        final Task task = new Task(prepareTestTask());
+        task.setPriority(TaskPriority.MINOR);
+
+        // When
+        // Then
+    }
+
+    @Test
+    @Disabled
+    //TODO: Need to finish test
+    public void shouldSwitchTaskPriorityIfTaskExistsAndPriorityIsMajor() {
+        // Given
+        final Task task = new Task(prepareTestTask());
+        task.setPriority(TaskPriority.MINOR);
+
+        // When
+        // Then
+    }
+
+    @Test
+    public void switchPriorityWhenTaskNotExistsShouldThrowException() {
+        // Given
+        given(taskRepositoryMock.getById(any())).willReturn(null);
+
+        // When
+        // Then
+        assertThatThrownBy(() -> taskService.switchPriority(1L)).isInstanceOf(RuntimeException.class);
+    }
+
+    @Test
+    @Disabled
+    //TODO: Need to finish test
+    public void shouldFinishTaskWhenTaskExists() {
+        // Given
+        given(taskRepositoryMock.getById(any())).willReturn(null);
+
+        // When
+        // Then
+    }
+
+    @Test
+    public void finishTaskWhenTaskNotExistsShouldThrowException() {
+        // Given
+        given(taskRepositoryMock.getById(any())).willReturn(null);
+
+        // When
+        // Then
+        assertThatThrownBy(() -> taskService.finishTask(1L)).isInstanceOf(RuntimeException.class);
     }
 }

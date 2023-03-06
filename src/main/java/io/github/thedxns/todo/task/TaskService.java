@@ -56,8 +56,8 @@ class TaskService {
     public List<TaskDto> getUnfinishedByCreator(final String creatorId) {
         final List<Task> allTasks = taskRepository.findByCreatorId(creatorId);
         return allTasks.stream()
-            .filter(t -> !t.getStatus().equals(TaskStatus.DONE) && t.getTaskList() == null).map(TaskDto::from)
-                .collect(Collectors.toList());
+            .filter(t -> !t.getStatus().equals(TaskStatus.DONE) && !t.getStatus().equals(TaskStatus.DELETED) &&
+                    t.getTaskList() == null).map(TaskDto::from).collect(Collectors.toList());
     }
 
     public List<TaskDto> getDoneByCreator(final String creatorId) {
@@ -70,15 +70,15 @@ class TaskService {
     public List<TaskDto> getImportantByCreator(final String creatorId) {
         final List<Task> allTasks = taskRepository.findByCreatorId(creatorId);
         return allTasks.stream()
-            .filter(t -> !t.getStatus().equals(TaskStatus.DONE) && t.getPriority().equals(TaskPriority.MAJOR))
-                .map(TaskDto::from).collect(Collectors.toList());
+            .filter(t -> !t.getStatus().equals(TaskStatus.DONE) && !t.getStatus().equals(TaskStatus.DELETED)
+                    && t.getPriority().equals(TaskPriority.MAJOR)).map(TaskDto::from).collect(Collectors.toList());
     }
 
     public List<TaskDto> getCustom(final Long listId) {
         final List<Task> allTasks = taskRepository.findByTaskListId(listId);
         return allTasks.stream()
-            .filter(t -> !t.getStatus().equals(TaskStatus.DONE) && t.getTaskList() != null).map(TaskDto::from)
-                .collect(Collectors.toList());
+            .filter(t -> !t.getStatus().equals(TaskStatus.DONE) && !t.getStatus().equals(TaskStatus.DELETED)
+                    && t.getTaskList() != null).map(TaskDto::from).collect(Collectors.toList());
     }
 
     public boolean saveTask(final TaskRequest taskData) {

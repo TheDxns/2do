@@ -2,14 +2,13 @@ package io.github.thedxns.todo.task;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.*;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Random;
+import java.util.*;
 
 import io.github.thedxns.todo.tasklist.TaskListDto;
 import io.github.thedxns.todo.tasklist.TaskListService;
@@ -45,38 +44,39 @@ public class TaskServiceTests {
                 .createdOn(LocalDateTime.now()).updatedOn(null).build();
     }
 
+    private List<Task> prepareRandomTestTasks() {
+        final TaskListDto taskList = new TaskListDto(1L, "Test", new KeycloakId("123"), Collections.emptyList());
+        final List<Task> tasks = new ArrayList<>();
+
+        tasks.add(new Task(new TaskTestBuilder().id(1L).taskList(taskList).title("Test").description("Test task")
+                .priority(TaskPriority.MINOR).status(TaskStatus.WAITING).creator(prepareTestUser()).deadline(LocalDateTime.now())
+                .createdOn(LocalDateTime.now()).updatedOn(null).build()));
+
+        tasks.add(new Task(new TaskTestBuilder().id(2L).taskList(null).title("Test").description("Test task")
+                .priority(TaskPriority.MINOR).status(TaskStatus.IN_PROGRESS).creator(prepareTestUser()).deadline(LocalDateTime.now())
+                .createdOn(LocalDateTime.now()).updatedOn(null).build()));
+
+        tasks.add(new Task(new TaskTestBuilder().id(3L).taskList(null).title("Test").description("Test task")
+                .priority(TaskPriority.MAJOR).status(TaskStatus.DONE).creator(prepareTestUser()).deadline(LocalDateTime.now())
+                .createdOn(LocalDateTime.now()).updatedOn(null).build()));
+
+        tasks.add(new Task(new TaskTestBuilder().id(4L).taskList(null).title("Test").description("Test task")
+                .priority(TaskPriority.MAJOR).status(TaskStatus.IN_PROGRESS).creator(prepareTestUser()).deadline(LocalDateTime.now())
+                .createdOn(LocalDateTime.now()).updatedOn(null).build()));
+
+        tasks.add(new Task(new TaskTestBuilder().id(5L).taskList(null).title("Test").description("Test task")
+                .priority(TaskPriority.MAJOR).status(TaskStatus.DELETED).creator(prepareTestUser()).deadline(LocalDateTime.now())
+                .createdOn(LocalDateTime.now()).updatedOn(null).build()));
+
+        return tasks;
+    }
+
     private UserDto prepareTestUser() {
         return new UserTestBuilder().name("John Doe").keycloakId("123").build();
     }
 
-    public LocalDateTime getTestDate() {
-        return LocalDateTime.parse("2019-05-08T11:33:08.863");
-    }
-
-    public void setUpTestTask() {
-        Task task1 = new Task();
-        task1.setTitle("A new test task");
-        task1.setContent("<h1>This task was created for unit testing purpose.</h1>");
-        task1.setCreatorId("user1234");
-        task1.setPriority(TaskPriority.MAJOR);
-        task1.setStatus(TaskStatus.WAITING);
-        task1.setCreatedOn(getTestDate());
-        doReturn(task1).when(taskRepositoryMock).getById((long) 1);
-    }
-
-    public static String generateRandomString(int length) {
-		String chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijk"
-          +"lmnopqrstuvwxyz!@#$%&";
-		Random rnd = new Random();
-		StringBuilder stringBuilder = new StringBuilder(length);
-		for (int i = 0; i < length; i++) {
-            stringBuilder.append(chars.charAt(rnd.nextInt(chars.length())));
-        }
-		return stringBuilder.toString();
-	}
-
     @Test
-    public void shouldReturnAllTasksFromRepository() {
+    public void getAllTasks_shouldReturnAllTasksFromRepository() {
         // Given
         final Task firstTask = new Task(prepareTestTask());
         final Task secondTask = new Task(prepareTestTask());
@@ -89,33 +89,24 @@ public class TaskServiceTests {
     }
 
     @Test
-    @Disabled
-    //TODO: Need to finish test
-    public void shouldSwitchTaskPriorityIfTaskExistsAndPriorityIsMinor() {
+    public void switchTaskPriority_shouldSwitchTaskPriorityIfTaskExists() {
         // Given
         final Task task = new Task(prepareTestTask());
-        task.setPriority(TaskPriority.MINOR);
+        given(taskRepositoryMock.findById(any())).willReturn(Optional.of(task));
 
         // When
+        taskService.switchPriority(1L);
+
         // Then
+        verify(taskRepositoryMock, times(1)).save(any());
+        assertDoesNotThrow(() -> taskService.switchPriority(1L));
+        assertThat(taskService.switchPriority(1L)).isTrue();
     }
 
     @Test
-    @Disabled
-    //TODO: Need to finish test
-    public void shouldSwitchTaskPriorityIfTaskExistsAndPriorityIsMajor() {
+    public void switchTaskPriority_shouldThrowExceptionIfTaskNotExists() {
         // Given
-        final Task task = new Task(prepareTestTask());
-        task.setPriority(TaskPriority.MINOR);
-
-        // When
-        // Then
-    }
-
-    @Test
-    public void switchPriorityWhenTaskNotExistsShouldThrowException() {
-        // Given
-        given(taskRepositoryMock.getById(any())).willReturn(null);
+        given(taskRepositoryMock.findById(any())).willReturn(Optional.empty());
 
         // When
         // Then
@@ -123,23 +114,76 @@ public class TaskServiceTests {
     }
 
     @Test
-    @Disabled
-    //TODO: Need to finish test
-    public void shouldFinishTaskWhenTaskExists() {
+    public void finishTask_shouldShouldChangeTaskStatusWhenTaskExists() {
         // Given
-        given(taskRepositoryMock.getById(any())).willReturn(null);
+        final Task task = new Task(prepareTestTask());
+        given(taskRepositoryMock.findById(any())).willReturn(Optional.of(task));
 
         // When
+        taskService.finishTask(1L);
+
         // Then
+        verify(taskRepositoryMock, times(1)).save(any());
+        assertDoesNotThrow(() -> taskService.finishTask(1L));
+        assertThat(taskService.finishTask(1L)).isTrue();
     }
 
     @Test
-    public void finishTaskWhenTaskNotExistsShouldThrowException() {
+    public void finishTask_shouldThrowExceptionIfTaskNotExists() {
         // Given
-        given(taskRepositoryMock.getById(any())).willReturn(null);
+        given(taskRepositoryMock.findById(any())).willReturn(Optional.empty());
 
         // When
         // Then
         assertThatThrownBy(() -> taskService.finishTask(1L)).isInstanceOf(RuntimeException.class);
+    }
+
+    @Test
+    public void getUnfinishedByCreator_shouldReturnNonDoneAndNonDeletedUnfinishedTasksThatAreNotOnCustomList() {
+        // Given
+        given(taskRepositoryMock.findByCreatorId(any())).willReturn(prepareRandomTestTasks());
+
+        // When
+        // Then
+        assertThat(taskService.getUnfinishedByCreator("123")).hasSize(2);
+    }
+
+    @Test
+    public void getImportantByCreator_shouldReturnNonDoneAndNonDeletedTasksWithMajorPriorityThatAreNotOnCustomList() {
+        // Given
+        given(taskRepositoryMock.findByCreatorId(any())).willReturn(prepareRandomTestTasks());
+
+        // When
+        // Then
+        assertThat(taskService.getImportantByCreator("123")).hasSize(1);
+    }
+    @Test
+    public void getDoneByCreator_shouldReturnDoneAndNonDeletedTasksThatAreNotOnCustomList() {
+        // Given
+        given(taskRepositoryMock.findByCreatorId(any())).willReturn(prepareRandomTestTasks());
+
+        // When
+        // Then
+        assertThat(taskService.getDoneByCreator("123")).hasSize(1);
+    }
+
+    @Test
+    public void getTasksByKeyword_shouldReturnTasksThatContainGivenKeyAndThatAreNotOnCustomList() {
+        // Given
+        given(taskRepositoryMock.findByTitleContainingIgnoreCase(any())).willReturn(prepareRandomTestTasks());
+
+        // When
+        // Then
+        assertThat(taskService.getTasksByKeyword("Test")).hasSize(5);
+    }
+
+    @Test
+    public void getCustom_shouldReturnNonDoneAndNonDeletedTasksThatAreOnCustomList() {
+        // Given
+        given(taskRepositoryMock.findByTaskListId(any())).willReturn(prepareRandomTestTasks());
+
+        // When
+        // Then
+        assertThat(taskService.getCustom(1L)).hasSize(1);
     }
 }

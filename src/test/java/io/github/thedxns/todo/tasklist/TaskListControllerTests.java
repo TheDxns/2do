@@ -209,7 +209,7 @@ public class TaskListControllerTests {
 
         // When
         // Then
-        assertThat(taskListController.grantAccessToUser(1L, "John")).isEqualTo(ResponseEntity.notFound().build());
+        assertThat(taskListController.removeAccessOfUser(1L, "John")).isEqualTo(ResponseEntity.notFound().build());
     }
 
     @Test

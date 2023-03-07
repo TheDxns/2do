@@ -39,11 +39,6 @@ public class TaskList {
         this.ownerId = dto.getOwner().getId();
         this.users = dto.getUsers() != null ? dto.getUsers().stream().map(KeycloakId::getId).collect(Collectors.toList()) : null;
     }
-    public void updateFromDto(final TaskListDto dto) {
-        this.title = dto.getTitle();
-        this.ownerId = dto.getOwner().getId();
-        this.users = dto.getUsers() != null ? dto.getUsers().stream().map(Object::toString).collect(Collectors.toList()) : null;
-    }
 
     public Long getId() {
         return id;

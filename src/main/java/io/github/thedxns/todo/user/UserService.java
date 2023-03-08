@@ -5,21 +5,21 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
 
-    private final UserController userController;
+    private final KeycloakApiService keycloakApiService;
 
-    public UserService(UserController userController) {
-        this.userController = userController;
+    public UserService(KeycloakApiService keycloakApiService) {
+        this.keycloakApiService = keycloakApiService;
     }
 
     public UserDto getUserById(final KeycloakId id) {
-        return userController.getUser(id.getId());
+        return keycloakApiService.getUser(id.getId());
     }
 
     public KeycloakId getUserId(final String username) {
-        return new KeycloakId(userController.getUserByUsername(username));
+        return new KeycloakId(keycloakApiService.getUserIdByUsername(username));
     }
 
     public String getUsername(final KeycloakId userId) {
-        return userController.getUsername(userId.getId());
+        return keycloakApiService.getUsername(userId.getId());
     }
 }

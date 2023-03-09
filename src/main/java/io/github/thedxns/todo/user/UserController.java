@@ -37,7 +37,7 @@ public class UserController {
     }
 
     @GetMapping("/id/{key}")
-	public ResponseEntity<?> getUserByUsername(@PathVariable String key) {
+	public ResponseEntity<?> getUserIdByUsername(@PathVariable String key) {
         final String userId = keycloakApiService.getUserIdByUsername(key);
         if (userId == null) {
             return ResponseEntity.notFound().build();

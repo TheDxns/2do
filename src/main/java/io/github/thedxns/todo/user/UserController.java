@@ -10,25 +10,25 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/users")
 public class UserController {
 
-    private final KeycloakApiService keycloakApiService;
+    private final UserService userService;
 
-    public UserController(KeycloakApiService keycloakApiService) {
-        this.keycloakApiService = keycloakApiService;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping
 	private ResponseEntity<?> getAllUsers() {
-        return ResponseEntity.ok(keycloakApiService.getAllUsers());
+        return ResponseEntity.ok(userService.getAllUsers());
 	}
 
     @GetMapping("/username")
 	private ResponseEntity<?> getAllUsersUsernames() {
-        return ResponseEntity.ok(keycloakApiService.getAllUsersUsernames());
+        return ResponseEntity.ok(userService.getAllUsernames());
 	}
 
     @GetMapping("/{id}")
 	public ResponseEntity<?> getUser(@PathVariable String id) {
-        final UserDto user = keycloakApiService.getUser(id);
+        final UserDto user = userService.getUserById(new KeycloakId(id));
         if (user == null) {
             return ResponseEntity.notFound().build();
         } else {
@@ -38,7 +38,7 @@ public class UserController {
 
     @GetMapping("/id/{key}")
 	public ResponseEntity<?> getUserIdByUsername(@PathVariable String key) {
-        final String userId = keycloakApiService.getUserIdByUsername(key);
+        final KeycloakId userId = userService.getUserId(key);
         if (userId == null) {
             return ResponseEntity.notFound().build();
         } else {
@@ -48,14 +48,11 @@ public class UserController {
 
     @GetMapping("/username/{key}")
     public ResponseEntity<?> getUsername(@PathVariable String key) {
-        final String username = keycloakApiService.getUsername(key);
+        final String username = userService.getUsername(new KeycloakId(key));
         if (username == null) {
             return ResponseEntity.notFound().build();
         } else {
             return ResponseEntity.ok(username);
         }
 	}
-
-
-
 }

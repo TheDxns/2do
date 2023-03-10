@@ -11,10 +11,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
-public class UserControllerTests {
+public class UserControllerTest {
 
     @Mock
-    private KeycloakApiService keycloakApiService;
+    private UserService userService;
 
     @InjectMocks
     private UserController userController;
@@ -28,7 +28,7 @@ public class UserControllerTests {
     public void getUser_shouldReturn200WhenUserWhenFound() {
         // Given
         final UserDto user = new UserDto("test", "John Doe");
-        given(keycloakApiService.getUser(any())).willReturn(user);
+        given(userService.getUserById(any())).willReturn(user);
 
         // When
         // Then
@@ -38,7 +38,7 @@ public class UserControllerTests {
     @Test
     public void getUser_shouldReturn404WhenUserNotWhenFound() {
         // Given
-        given(keycloakApiService.getUser(any())).willReturn(null);
+        given(userService.getUserById(any())).willReturn(null);
 
         // When
         // Then
@@ -48,8 +48,8 @@ public class UserControllerTests {
     @Test
     public void getUserIdByUsername_shouldReturn200WhenUserWhenFound() {
         // Given
-        final String userId = "userId";
-        given(keycloakApiService.getUserIdByUsername(any())).willReturn(userId);
+        final KeycloakId userId = new KeycloakId("userId");
+        given(userService.getUserId(any())).willReturn(userId);
 
         // When
         // Then
@@ -59,7 +59,7 @@ public class UserControllerTests {
     @Test
     public void getUserIdByUsername_shouldReturn404WhenUserNotWhenFound() {
         // Given
-        given(keycloakApiService.getUserIdByUsername(any())).willReturn(null);
+        given(userService.getUserId(any())).willReturn(null);
 
         // When
         // Then
@@ -70,7 +70,7 @@ public class UserControllerTests {
     public void getUsername_shouldReturn200WhenUserWhenFound() {
         // Given
         final String userId = "userId";
-        given(keycloakApiService.getUsername(any())).willReturn(userId);
+        given(userService.getUsername(any())).willReturn(userId);
 
         // When
         // Then
@@ -80,7 +80,7 @@ public class UserControllerTests {
     @Test
     public void getUsername_shouldReturn404WhenUserNotWhenFound() {
         // Given
-        given(keycloakApiService.getUser(any())).willReturn(null);
+        given(userService.getUserById(any())).willReturn(null);
 
         // When
         // Then

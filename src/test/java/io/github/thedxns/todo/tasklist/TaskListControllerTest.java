@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
-public class TaskListControllerTests {
+public class TaskListControllerTest {
 
     @Mock
     TaskListService taskListService;

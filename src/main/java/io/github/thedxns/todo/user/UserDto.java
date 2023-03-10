@@ -16,4 +16,8 @@ public class UserDto {
     public String getName() {
         return name;
     }
+
+    public static UserDto from(KeycloakUserResponse userResponse) {
+        return new UserDto(userResponse.getId(), userResponse.getFirstName() + " " + userResponse.getLastName());
+    }
 }

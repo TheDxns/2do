@@ -20,7 +20,7 @@ import org.junit.jupiter.api.*;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class TaskServiceTests {
+public class TaskServiceTest {
 
     @Mock
     private TaskListService taskListServiceMock;

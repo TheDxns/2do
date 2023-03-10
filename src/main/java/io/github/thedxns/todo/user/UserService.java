@@ -2,24 +2,46 @@ package io.github.thedxns.todo.user;
 
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 public class UserService {
 
-    private final KeycloakApiService keycloakApiService;
+    private final KeycloakApiClient keycloakApiClient;
 
-    public UserService(KeycloakApiService keycloakApiService) {
-        this.keycloakApiService = keycloakApiService;
+    public UserService(KeycloakApiClient keycloakApiClient) {
+        this.keycloakApiClient = keycloakApiClient;
+    }
+
+    public List<UserDto> getAllUsers() {
+        return keycloakApiClient.getAllUsers().stream().map(UserDto::from).collect(Collectors.toList());
+    }
+
+    public List<String> getAllUsernames() {
+        return keycloakApiClient.getAllUsers().stream().map(KeycloakUserResponse::getUsername).collect(Collectors.toList());
     }
 
     public UserDto getUserById(final KeycloakId id) {
-        return keycloakApiService.getUser(id.getId());
+        final KeycloakUserResponse userResponse = keycloakApiClient.getUserById(id.getId());
+        return UserDto.from(userResponse);
     }
 
     public KeycloakId getUserId(final String username) {
-        return new KeycloakId(keycloakApiService.getUserIdByUsername(username));
+        final List<KeycloakUserResponse> userResponses = keycloakApiClient.getAllUsers();
+        final Optional<KeycloakUserResponse> userId = userResponses.stream().filter(
+                v -> Objects.equals(v.getUsername(), username)).findFirst();
+        if (userId.isPresent()) {
+            return new KeycloakId(userId.get().getId());
+        } else {
+            throw new RuntimeException("User not exist");
+        }
     }
 
     public String getUsername(final KeycloakId userId) {
-        return keycloakApiService.getUsername(userId.getId());
+        final KeycloakUserResponse userResponse = keycloakApiClient.getUserById(userId.getId());
+        return userResponse.getUsername();
     }
 }

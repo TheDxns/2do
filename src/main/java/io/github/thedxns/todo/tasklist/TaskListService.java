@@ -3,7 +3,6 @@ package io.github.thedxns.todo.tasklist;
 import io.github.thedxns.todo.user.KeycloakId;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;

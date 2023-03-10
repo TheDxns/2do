@@ -30,13 +30,7 @@ public class KeycloakApiService {
             throw new RuntimeException("User not found");
         }
         final JSONArray allUserArray = new JSONArray(response.getBody());
-        final List<String> users = new ArrayList<>();
-        String username;
-        for (int i = 0; i < allUserArray.length(); i++) {
-            username = allUserArray.getJSONObject(i).getString("username");
-            users.add(username);
-        }
-        return users;
+        return getValuesFromJSONArrayByKey(allUserArray, "username");
     }
 
     public UserDto getUser(String id) {
@@ -57,14 +51,8 @@ public class KeycloakApiService {
             throw new RuntimeException("User not found");
         }
         final JSONArray userArray = new JSONArray(response.getBody());
-        final Map<String, String> users = new TreeMap<>();
-        String username;
-        String id;
-        for (int i = 0; i < userArray.length(); i++) {
-            username = userArray.getJSONObject(i).getString("username");
-            id = userArray.getJSONObject(i).getString("id");
-            users.put(username, id);
-        }
+        final Map<String, String> users = convertJSONArrayToStringMap(userArray, "id", "username");
+
         return users.get(key);
     }
 
@@ -74,15 +62,26 @@ public class KeycloakApiService {
             throw new RuntimeException("User not found");
         }
         final JSONArray userArray = new JSONArray(response.getBody());
-        final Map<String, String> users = new TreeMap<>();
-        String username;
-        String id;
-        for (int i = 0; i < userArray.length(); i++) {
-            username = userArray.getJSONObject(i).getString("username");
-            id = userArray.getJSONObject(i).getString("id");
-            users.put(id, username);
-        }
+        final Map<String, String> users = convertJSONArrayToStringMap(userArray, "username", "id");
+
         return users.get(key);
     }
 
+    private Map<String, String> convertJSONArrayToStringMap(final JSONArray jsonArray, final String key, final String value) {
+        final Map<String, String> map = new TreeMap<>();
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+            map.put(jsonArray.getJSONObject(i).getString(key), jsonArray.getJSONObject(i).getString(value));
+        }
+        return map;
+    }
+
+    private List<String> getValuesFromJSONArrayByKey(final JSONArray jsonArray, final String key) {
+        final List<String> list = new ArrayList<>();
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+            list.add(jsonArray.getJSONObject(i).getString("username"));
+        }
+        return list;
+    }
 }

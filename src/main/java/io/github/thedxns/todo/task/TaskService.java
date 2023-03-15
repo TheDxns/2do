@@ -82,7 +82,12 @@ class TaskService {
     }
 
     public boolean saveTask(final TaskRequest taskData) {
-        final TaskListDto taskList = taskListService.getTaskList(taskData.getTaskListId());
+        final TaskListDto taskList;
+        if (taskData.getTaskListId() != null) {
+            taskList = taskListService.getTaskList(taskData.getTaskListId());
+        } else {
+            taskList = null;
+        }
 
         final UserDto creator = userService.getUserById(new KeycloakId(taskData.getCreatorId()));
         final TaskDto task = new TaskDto(taskData.getTitle(), taskData.getDescription(), taskData.getPriority(),
@@ -111,7 +116,7 @@ class TaskService {
     }
 
     public boolean saveCustomListTask(final Long id, final TaskRequest taskData) {
-        final TaskListDto taskList = taskListService.getTaskList(taskData.getTaskListId());
+        final TaskListDto taskList = taskListService.getTaskList(id);
         final UserDto creator = userService.getUserById(new KeycloakId(taskData.getCreatorId()));
         final TaskDto task = new TaskDto(id, taskData.getTitle(), taskData.getDescription(), taskData.getPriority(),
                 taskData.getStatus(), creator, taskList, taskData.getDeadline());

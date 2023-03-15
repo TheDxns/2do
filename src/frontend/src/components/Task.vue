@@ -2,14 +2,14 @@
 <v-container>
   <v-expansion-panel>
         <v-expansion-panel-header @click="getPermittedUsers()">
-          <span v-if= "task.prioritized === false">{{task.title}}</span>
+          <span v-if= "task.priority === 'MINOR'">{{task.title}}</span>
           <span v-else style="color:red;">{{task.title}}</span>
           <span style="color:grey;" v-if="task.deadline != null">({{task.deadline | formatDate}})</span>
           <v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer>
           <v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer>
           <v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer><v-spacer></v-spacer>
     
-        <span @click.stop="setTaskAsDone">Oznacz jako wykonane</span> <span v-if="task.prioritized === false" @click.stop="toggleImportant">Zwiększ priorytet</span> <span v-else @click.stop="toggleImportant">Zmiejsz priorytet</span> <span style="color: red;" @click.stop="deleteTask">Usuń</span>
+        <span @click.stop="setTaskAsDone">Oznacz jako wykonane</span> <span v-if="task.priority === 'MINOR'" @click.stop="toggleImportant">Zwiększ priorytet</span> <span v-else @click.stop="toggleImportant">Zmiejsz priorytet</span> <span style="color: red;" @click.stop="deleteTask">Usuń</span>
         </v-expansion-panel-header>
         <v-expansion-panel-content>
         

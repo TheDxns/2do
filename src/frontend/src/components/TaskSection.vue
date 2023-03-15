@@ -41,7 +41,8 @@
             <v-list-item>
                 <v-list-item-content>
                   <v-list-item-title><span class="text-caption">Osoby z dostępem:</span></v-list-item-title>
-                  <v-list-item-title v-for="permittedUser in permittedUsers" :key="permittedUser" v-bind:permittedUser="permittedUser"><li class="ml-1">{{permittedUser}}&ensp;<a @click="removeAccess(permittedUser)" style="color:red;">x</a></li></v-list-item-title>
+                  <v-list-item-title v-if="permittedUsers.length === 0"><span style="color:grey">Nie udostępniono</span></v-list-item-title>
+                  <v-list-item-title v-else v-for="permittedUser in permittedUsers" :key="permittedUser" v-bind:permittedUser="permittedUser"><li class="ml-1">{{permittedUser}}&ensp;<a @click="removeAccess(permittedUser)" style="color:red;">x</a></li></v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
           </v-list>
@@ -300,14 +301,19 @@ import Task from '@/components/Task.vue'
           }
         },
         addStandardTask() {
-          let important = this.currentListName === "Priorytetowe";
+          let taskPriority;
+          if (this.currentListName === "Priorytetowe") {
+            taskPriority = "MAJOR";
+          } else {
+            taskPriority = "MINOR";
+          }
           fetch("/api/tasks", {
                   method: 'post',
                   headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                   },
-                  body:JSON.stringify({title:this.newTaskTitle, creatorId: this.$keycloak.idTokenParsed.sub, prioritized: important})
+                  body:JSON.stringify({title:this.newTaskTitle, creatorId: this.$keycloak.idTokenParsed.sub, status:"WAITING", priority: taskPriority})
                 }).then(response => response.text())
                   .then((response) => {
                       console.log(response);
@@ -320,14 +326,19 @@ import Task from '@/components/Task.vue'
                   .catch(err => console.log(err));
         },
         addTaskToCustomList() {
-          let important = this.currentListName === "Priorytetowe";
+          let taskPriority;
+          if (this.currentListName === "Priorytetowe") {
+            taskPriority = "MAJOR";
+          } else {
+            taskPriority = "MINOR";
+          }
           fetch("/api/tasks/" + this.currentListId, {
                   method: 'post',
                   headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                   },
-                  body:JSON.stringify({title:this.newTaskTitle, creatorId: this.$keycloak.idTokenParsed.sub, prioritized: important})
+                  body:JSON.stringify({title:this.newTaskTitle, creatorId: this.$keycloak.idTokenParsed.sub, status:"WAITING", priority: taskPriority})
                 }).then(response => response.text())
                   .then((response) => {
                       console.log(response);

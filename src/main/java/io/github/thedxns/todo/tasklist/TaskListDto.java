@@ -2,19 +2,18 @@ package io.github.thedxns.todo.tasklist;
 
 import io.github.thedxns.todo.user.KeycloakId;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class TaskListDto {
 
-    private final Long taskListId;
+    private final Long id;
     private final String title;
     private final KeycloakId owner;
     private final List<KeycloakId> users;
 
-    public TaskListDto(Long taskListId, String title, KeycloakId owner, List<KeycloakId> users) {
-        this.taskListId = taskListId;
+    public TaskListDto(Long id, String title, KeycloakId owner, List<KeycloakId> users) {
+        this.id = id;
         this.title = title;
         this.owner = owner;
         this.users = users;
@@ -28,19 +27,19 @@ public class TaskListDto {
         return null;
     }
 
-    public Long getTaskListId() {
-        return taskListId;
+    public Long getId() {
+        return id;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public List<KeycloakId> getUsers() {
-        return users;
-    }
-
     public KeycloakId getOwner() {
         return owner;
+    }
+
+    public List<KeycloakId> getUsers() {
+        return users;
     }
 }

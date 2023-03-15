@@ -1,8 +1,5 @@
 package io.github.thedxns.todo.tasklist;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.validation.Valid;
 
 import io.github.thedxns.todo.user.KeycloakId;
@@ -48,6 +45,11 @@ class TaskListController {
     @GetMapping("/user/{username}")
     public ResponseEntity<?> getTaskListsByUser(@PathVariable String username) {
         return ResponseEntity.ok(taskListService.getAllByUser(username));
+    }
+
+    @GetMapping("/owner/{ownerId}")
+    public ResponseEntity<?> getTaskListsByOwnerId(@PathVariable String ownerId) {
+        return ResponseEntity.ok(taskListService.getAllByOwnerId(ownerId));
     }
 
     @PostMapping
@@ -115,12 +117,10 @@ class TaskListController {
 
     @GetMapping("/access/{id}")
     public ResponseEntity<?> getPermittedUsers(@PathVariable Long id) {
-        final TaskListDto taskList = taskListService.getTaskList(id);
-        final List<KeycloakId> users = taskList.getUsers();
-        final List<String> usernames = new ArrayList<>();
-        for (KeycloakId user : users) {
-            usernames.add(userService.getUsername(user));
+        if (taskListService.existsById(id)) {
+            return ResponseEntity.ok(taskListService.getPermittedUsers(id));
+        } else {
+            return ResponseEntity.internalServerError().build();
         }
-        return ResponseEntity.ok(usernames);
     }
 }

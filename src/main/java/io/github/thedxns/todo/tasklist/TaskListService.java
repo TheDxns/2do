@@ -1,18 +1,24 @@
 package io.github.thedxns.todo.tasklist;
 
 import io.github.thedxns.todo.user.KeycloakId;
+import io.github.thedxns.todo.user.UserDto;
+import io.github.thedxns.todo.user.UserService;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class TaskListService {
+
+    private final UserService userService;
     private final TaskListRepository taskListRepository;
 
-    TaskListService(TaskListRepository taskListRepository) {
+    TaskListService(TaskListRepository taskListRepository, UserService userService) {
         this.taskListRepository = taskListRepository;
+        this.userService = userService;
     }
 
     List<TaskListDto> getAllTaskLists() {
@@ -26,6 +32,10 @@ public class TaskListService {
 
     List<TaskListDto> getAllByUser(final String username) {
         return taskListRepository.findByUsers(username).stream().map(TaskListDto::from).collect(Collectors.toList());
+    }
+
+    List<TaskListDto> getAllByOwnerId(final String ownerId) {
+        return taskListRepository.findByOwnerId(ownerId).stream().map(TaskListDto::from).collect(Collectors.toList());
     }
 
     boolean saveTaskList(final TaskListRequest taskListRequest) {
@@ -61,7 +71,7 @@ public class TaskListService {
         return true;
     }
 
-    public boolean removeAccessOfUser(final Long taskListId, final KeycloakId userId) {
+    public boolean removeAccessOfUser(final long taskListId, final KeycloakId userId) {
         final TaskListDto taskListData = getTaskList(taskListId);
         final TaskList taskList = new TaskList(taskListData);
         final List<String> users = taskList.getUsers();
@@ -69,5 +79,16 @@ public class TaskListService {
         taskList.setUsers(users);
         taskListRepository.save(taskList);
         return true;
+    }
+
+    public List<String> getPermittedUsers(final Long id) {
+        final TaskListDto taskList = getTaskList(id);
+        final List<KeycloakId> users = taskList.getUsers();
+        final List<String> usernames = new ArrayList<>();
+        for (KeycloakId user : users) {
+            UserDto userData = userService.getUserById(user);
+            usernames.add(userData.getName() + " (" + userData.getUsername() + ")");
+        }
+        return usernames;
     }
 }

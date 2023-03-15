@@ -61,7 +61,7 @@ public class TaskDto {
 
     public static TaskDto from(Task task) {
         return new TaskDto(task.getId(), task.getTitle(), task.getContent(), task.getPriority(), task.getStatus(),
-                new UserDto(task.getCreatorId(), task.getResponsible()), TaskListDto.from(task.getTaskList()),
+                new UserDto(task.getCreatorId(), task.getResponsible(), null), TaskListDto.from(task.getTaskList()),
                 task.getDeadline(), task.getCreatedOn(), task.getUpdatedOn());
     }
 

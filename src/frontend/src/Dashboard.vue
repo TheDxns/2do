@@ -183,7 +183,7 @@ export default {
     },
     methods: {
       getLists() {
-        fetch("/api/lists/owner/" + this.$keycloak.idTokenParsed.sub)
+        fetch("/api/lists/permitted/" + this.$keycloak.idTokenParsed.sub)
           .then((response) => response.json())
           .then((data) => {
             this.lists = data;

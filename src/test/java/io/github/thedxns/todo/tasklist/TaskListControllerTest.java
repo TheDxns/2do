@@ -1,9 +1,6 @@
 package io.github.thedxns.todo.tasklist;
 
-import io.github.thedxns.todo.user.KeycloakId;
-import io.github.thedxns.todo.user.UserDto;
-import io.github.thedxns.todo.user.UserService;
-import io.github.thedxns.todo.user.UserTestBuilder;
+import io.github.thedxns.todo.user.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -12,6 +9,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -244,7 +242,9 @@ public class TaskListControllerTest {
     @Test
     public void getPermittedUsers_shouldReturn200ResponseAndEmptyListWhenNoPermittedUsersFound() {
         // Given
-        given(taskListService.getTaskList(any())).willReturn(prepareTestTaskList());
+        final List<UserResponse> userResponses = new ArrayList<>();
+        given(taskListService.existsById(any())).willReturn(true);
+        given(taskListService.getPermittedUsers(any())).willReturn(userResponses);
         given(userService.getUsername(any())).willReturn("123");
 
         // When

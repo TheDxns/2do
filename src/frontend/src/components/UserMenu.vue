@@ -38,7 +38,7 @@
           </p>
           <v-divider class="my-3"></v-divider>
           <v-btn
-              href="http://localhost:8180/auth/realms/Todo/account/#/personal-info"
+              href="http://localhost:8080/auth/realms/Todo/account/#/personal-info"
               target="_blank"
               depressed
               rounded
@@ -48,7 +48,7 @@
           </v-btn>
           <v-divider class="my-3"></v-divider>
           <v-btn
-            href="http://localhost:8180/auth/realms/Todo/account/#/security/signingin"
+            href="http://localhost:8080/auth/realms/Todo/account/#/security/signingin"
             target="_blank"
             depressed
             rounded

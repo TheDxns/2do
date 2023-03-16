@@ -4,6 +4,7 @@ public class UserTestBuilder {
 
     private String keycloakId;
     private String name;
+    private String username;
 
     public UserTestBuilder keycloakId(String keycloakId) {
         this.keycloakId = keycloakId;
@@ -15,7 +16,12 @@ public class UserTestBuilder {
         return this;
     }
 
+    public UserTestBuilder username(String username) {
+        this.username = username;
+        return this;
+    }
+
     public UserDto build() {
-        return new UserDto(keycloakId, name);
+        return new UserDto(keycloakId, name, username);
     }
 }

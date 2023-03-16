@@ -42,7 +42,7 @@
                 <v-list-item-content>
                   <v-list-item-title><span class="text-caption">Osoby z dostępem:</span></v-list-item-title>
                   <v-list-item-title v-if="permittedUsers.length === 0"><span style="color:grey">Nie udostępniono</span></v-list-item-title>
-                  <v-list-item-title v-else v-for="permittedUser in permittedUsers" :key="permittedUser" v-bind:permittedUser="permittedUser"><li class="ml-1">{{permittedUser}}&ensp;<a @click="removeAccess(permittedUser)" style="color:red;">x</a></li></v-list-item-title>
+                  <v-list-item-title v-else v-for="permittedUser in permittedUsers" :key="permittedUser" v-bind:permittedUser="permittedUser"><li class="ml-1">{{permittedUser.name}} ({{permittedUser.username}})&ensp;<a @click="removeAccess(permittedUser.username)" style="color:red;">x</a></li></v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
           </v-list>
@@ -187,8 +187,8 @@ import Task from '@/components/Task.vue'
         listEditMenu: false,
         username: '',
         newListName: this.currentListName,
-        permittedUsers: '',
-        allUsers: ''
+        allUsers: '',
+        permittedUsers: []
       }
     },
     components: {
@@ -361,8 +361,10 @@ import Task from '@/components/Task.vue'
         },
       shareCustomList() {
         if (this.allUsers.includes(this.username)) {
-          if (this.permittedUsers.includes(this.username)) {
+          if (this.permittedUsers.some(user => this.allUsers.includes(user.username))) {
             window.alert("Podany użytkownik już ma dostęp do listy.")
+          } else if(this.keycloakData.idTokenParsed.preferred_username === this.username) {
+            window.alert("Podany użytkownik jest właścicielem listy.")
           } else {
           fetch("/api/lists/access/" + this.currentListId + "/" + this.username, { method: 'PATCH',
           headers: {

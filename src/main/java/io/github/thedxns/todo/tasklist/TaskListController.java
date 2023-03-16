@@ -42,14 +42,9 @@ class TaskListController {
         }
     }
 
-    @GetMapping("/user/{username}")
-    public ResponseEntity<?> getTaskListsByUser(@PathVariable String username) {
-        return ResponseEntity.ok(taskListService.getAllByUser(username));
-    }
-
-    @GetMapping("/owner/{ownerId}")
-    public ResponseEntity<?> getTaskListsByOwnerId(@PathVariable String ownerId) {
-        return ResponseEntity.ok(taskListService.getAllByOwnerId(ownerId));
+    @GetMapping("/permitted/{userId}")
+    public ResponseEntity<?> getTaskListsByUserId(@PathVariable String userId) {
+        return ResponseEntity.ok(taskListService.getAllPermittedForUser(userId));
     }
 
     @PostMapping

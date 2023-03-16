@@ -91,7 +91,7 @@ class TaskService {
 
         final UserDto creator = userService.getUserById(new KeycloakId(taskData.getCreatorId()));
         final TaskDto task = new TaskDto(taskData.getTitle(), taskData.getDescription(), taskData.getPriority(),
-                taskData.getStatus(), creator, taskList, taskData.getDeadline());
+                TaskStatus.WAITING, creator, taskList, taskData.getDeadline());
         taskRepository.save(new Task(task));
         return true;
     }
@@ -106,7 +106,7 @@ class TaskService {
     }
 
     public boolean updateTask(final Long id, final TaskRequest taskData) {
-        final TaskListDto taskList = taskListService.getTaskList(taskData.getTaskListId());
+        final TaskListDto taskList = taskListService.getTaskList(id);
         final UserDto creator = userService.getUserById(new KeycloakId(taskData.getCreatorId()));
         final TaskDto task = new TaskDto(id, taskData.getTitle(), taskData.getDescription(), taskData.getPriority(),
                 taskData.getStatus(), creator, taskList, taskData.getDeadline());
@@ -119,7 +119,7 @@ class TaskService {
         final TaskListDto taskList = taskListService.getTaskList(id);
         final UserDto creator = userService.getUserById(new KeycloakId(taskData.getCreatorId()));
         final TaskDto task = new TaskDto(id, taskData.getTitle(), taskData.getDescription(), taskData.getPriority(),
-                taskData.getStatus(), creator, taskList, taskData.getDeadline());
+                TaskStatus.WAITING, creator, taskList, taskData.getDeadline());
         taskRepository.save(new Task(task));
         return true;
     }

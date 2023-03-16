@@ -27,7 +27,7 @@ public class UserControllerTest {
     @Test
     public void getUser_shouldReturn200WhenUserWhenFound() {
         // Given
-        final UserDto user = new UserDto("test", "John Doe");
+        final UserDto user = new UserDto("test", "John Doe", "jdoe");
         given(userService.getUserById(any())).willReturn(user);
 
         // When

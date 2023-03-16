@@ -57,7 +57,7 @@
         <v-select v-else
           v-model="task.responsible"
           class="ml-8 mt-5"
-          :items="permittedUsers"
+          :items="permittedUsersNames"
           style="width:300px;"
           label="Zadanie przypisane do:"
           dense
@@ -66,7 +66,7 @@
           outlined
           name="input-7-4"
           label="Opis zadania"
-          v-model="task.content"
+          v-model="task.description"
           style="width:50%;"
           class="ml-7 mt-5"
         ></v-textarea>
@@ -99,16 +99,14 @@ export default {
       } else {
         return this.newDeadline;
       } 
+    },
+    permittedUsersNames() {
+      let allUsernames = [this.task.creator.name];
+      allUsernames = allUsernames.concat(this.permittedUsers.map(user => user.name));
+      return allUsernames;
     }
   },
   methods: {
-    getTaskList() {
-      fetch("/api/lists/"+ this.list.id)
-              .then((response) => response.json())
-              .then((data) => {
-                  this.tasks = data;
-              })
-    },
     deleteTask() {
       fetch("/api/tasks/" + this.task.id, { method: 'delete' })
         .then(response => response.text())
@@ -145,7 +143,8 @@ export default {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
-        body:JSON.stringify({id:this.task.id, title:this.newTaskTitle, taskList: this.task.taskList, content:this.task.content, prioritized:this.task.prioritized, responsible: this.task.responsible, creatorId: this.task.creatorId, deadline: new Date(this.newDeadline)})
+        body:JSON.stringify({id:this.task.id, title:this.newTaskTitle, taskListId: this.task.taskListId, description:this.task.description, priority:this.task.priority, creatorId: this.task.creator.keycloakId, status: this.task.status, deadline: new Date(this.newDeadline),
+          responsible: this.task.responsible})
       }).then(response => response.text())
         .then((response) => {
             console.log(response);

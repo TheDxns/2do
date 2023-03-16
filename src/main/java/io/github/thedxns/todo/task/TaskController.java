@@ -85,6 +85,9 @@ class TaskController {
 
     @PostMapping("/{id}")
     public ResponseEntity<?> saveCustomListTask(@PathVariable Long id, @Valid @RequestBody TaskRequest task) {
+        if (!taskService.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
         if (taskService.saveCustomListTask(id, task)) {
             return ResponseEntity.ok().build();
         } else {

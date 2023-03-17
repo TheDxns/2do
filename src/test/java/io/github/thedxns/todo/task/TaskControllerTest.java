@@ -32,14 +32,14 @@ public class TaskControllerTest {
 
 	private TaskRequest prepareTaskRequest() {
 		return new TaskRequest("Test", "Description", TaskPriority.MINOR, TaskStatus.WAITING,
-				"123", 1L, LocalDateTime.now());
+				"123", 1L, LocalDateTime.now(), "456");
 	}
 
 	private TaskDto prepareTestTask() {
 		final TaskListDto taskList = new TaskListDto(1L, "Test", new KeycloakId("123"), Collections.emptyList());
 		return new TaskTestBuilder().id(1L).taskList(taskList).title("Test").description("Test task")
 				.priority(TaskPriority.MINOR).status(TaskStatus.WAITING).creator(prepareTestUser()).deadline(LocalDateTime.now())
-				.createdOn(LocalDateTime.now()).updatedOn(null).build();
+				.responsible(new KeycloakId("responsibleUserId")).build();
 	}
 
 	private UserDto prepareTestUser() {

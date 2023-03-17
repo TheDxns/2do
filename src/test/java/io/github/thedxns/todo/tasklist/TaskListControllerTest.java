@@ -225,7 +225,7 @@ public class TaskListControllerTest {
     @Test
     public void getPermittedUsers_shouldReturn200ResponseAndUsernameListWhenPermittedUsersExist() {
         // Given
-        final List<UserResponse> permittedUsers = List.of(new UserResponse("jdoe", "John Doe"));
+        final List<UserResponse> permittedUsers = List.of(new UserResponse("id", "jdoe", "John Doe"));
         given(taskListService.existsById(any())).willReturn(true);
         given(taskListService.getPermittedUsers(any())).willReturn(permittedUsers);
 

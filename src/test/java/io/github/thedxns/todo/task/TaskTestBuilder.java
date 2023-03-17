@@ -1,6 +1,7 @@
 package io.github.thedxns.todo.task;
 
 import io.github.thedxns.todo.tasklist.TaskListDto;
+import io.github.thedxns.todo.user.KeycloakId;
 import io.github.thedxns.todo.user.UserDto;
 
 import java.time.LocalDateTime;
@@ -14,8 +15,7 @@ public class TaskTestBuilder {
     private UserDto creator;
     private TaskListDto taskList;
     private LocalDateTime deadline;
-    private LocalDateTime createdOn;
-    private LocalDateTime updatedOn;
+    private KeycloakId responsible;
 
     public TaskTestBuilder id(Long id) {
         this.id = id;
@@ -57,21 +57,16 @@ public class TaskTestBuilder {
         return this;
     }
 
-    public TaskTestBuilder createdOn(LocalDateTime createdOn) {
-        this.createdOn = createdOn;
-        return this;
-    }
-
-    public TaskTestBuilder updatedOn(LocalDateTime updatedOn) {
-        this.updatedOn = updatedOn;
+    public TaskTestBuilder responsible(KeycloakId responsible) {
+        this.responsible = responsible;
         return this;
     }
 
     public TaskDto build() {
         if (id != null) {
-            return new TaskDto(id, title, description, priority, status, creator, taskList, deadline, createdOn, updatedOn);
+            return new TaskDto(id, title, description, priority, status, creator, taskList, deadline, responsible);
         } else {
-            return new TaskDto(title, description, priority, status, creator, taskList, deadline);
+            return new TaskDto(title, description, priority, status, creator, taskList, deadline, responsible);
         }
     }
 }

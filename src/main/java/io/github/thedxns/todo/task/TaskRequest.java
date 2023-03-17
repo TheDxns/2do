@@ -10,8 +10,10 @@ public class TaskRequest {
     private String creatorId;
     private Long taskListId;
     private LocalDateTime deadline;
+    private String responsibleId;
 
-    public TaskRequest(String title, String description, TaskPriority priority, TaskStatus status, String creatorId, Long taskListId, LocalDateTime deadline) {
+    public TaskRequest(String title, String description, TaskPriority priority, TaskStatus status, String creatorId,
+                       Long taskListId, LocalDateTime deadline, String responsibleId) {
         this.title = title;
         this.description = description;
         this.priority = priority;
@@ -19,6 +21,7 @@ public class TaskRequest {
         this.creatorId = creatorId;
         this.taskListId = taskListId;
         this.deadline = deadline;
+        this.responsibleId = responsibleId;
     }
 
     public String getTitle() {
@@ -75,5 +78,13 @@ public class TaskRequest {
 
     public void setDeadline(LocalDateTime deadline) {
         this.deadline = deadline;
+    }
+
+    public String getResponsibleId() {
+        return responsibleId;
+    }
+
+    public void setResponsibleId(String responsibleId) {
+        this.responsibleId = responsibleId;
     }
 }

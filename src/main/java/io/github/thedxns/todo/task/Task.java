@@ -42,13 +42,11 @@ class Task {
         id = source.getId();
         title = source.getTitle();
         content = source.getDescription();
-        createdOn = source.getCreatedOn();
-        updatedOn = source.getUpdatedOn();
         priority = source.getPriority();
         creatorId = source.getCreator().getKeycloakId();
         status = source.getStatus();
         deadline = source.getDeadline();
-        responsible = source.getCreator().getName();
+        responsible = source.getCreator().getKeycloakId();
         taskList = source.getTaskList() != null ? new TaskList(source.getTaskList()) : null;
     }
 

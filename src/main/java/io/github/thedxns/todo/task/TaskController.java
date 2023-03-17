@@ -2,6 +2,7 @@ package io.github.thedxns.todo.task;
 
 import javax.validation.Valid;
 
+import io.github.thedxns.todo.tasklist.TaskListService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,10 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 class TaskController {
 
     private final TaskService taskService;
+    private final TaskListService taskListService;
 
     @Autowired
-    public TaskController(final TaskService taskService) {
+    public TaskController(final TaskService taskService, final TaskListService taskListService) {
         this.taskService = taskService;
+        this.taskListService = taskListService;
     }
     
     @GetMapping(params = {"!sort", "!page", "!size"})
@@ -85,7 +88,7 @@ class TaskController {
 
     @PostMapping("/{id}")
     public ResponseEntity<?> saveCustomListTask(@PathVariable Long id, @Valid @RequestBody TaskRequest task) {
-        if (!taskService.existsById(id)) {
+        if (!taskListService.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
         if (taskService.saveCustomListTask(id, task)) {

@@ -50,7 +50,7 @@ public class TaskListService {
         return true;
     }
 
-    boolean existsById(final Long id) {
+    public boolean existsById(final Long id) {
         return taskListRepository.existsById(id);
     }
 

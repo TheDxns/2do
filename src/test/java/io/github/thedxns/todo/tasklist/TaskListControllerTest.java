@@ -10,12 +10,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
 public class TaskListControllerTest {
@@ -192,7 +192,7 @@ public class TaskListControllerTest {
         // Given
         given(userService.getUserById(any())).willReturn(prepareTestUser());
         given(taskListService.existsById(any())).willReturn(true);
-        given(taskListService.removeAccessOfUser(any(), any())).willReturn(true);
+        given(taskListService.removeAccessOfUser(anyLong(), any())).willReturn(true);
 
         // When
         // Then
@@ -215,7 +215,7 @@ public class TaskListControllerTest {
         // Given
         given(userService.getUserById(any())).willReturn(prepareTestUser());
         given(taskListService.existsById(any())).willReturn(true);
-        given(taskListService.removeAccessOfUser(any(), any())).willReturn(false);
+        given(taskListService.removeAccessOfUser(anyLong(), any())).willReturn(false);
 
         // When
         // Then
@@ -225,18 +225,16 @@ public class TaskListControllerTest {
     @Test
     public void getPermittedUsers_shouldReturn200ResponseAndUsernameListWhenPermittedUsersExist() {
         // Given
-        final TaskListDto taskListWithPermittedUsers = new TaskListDto(1L, "Test", new KeycloakId("123"),
-                Arrays.asList(new KeycloakId("1"), new KeycloakId("2"), new KeycloakId("3")));
-        final List<String> usernames = Arrays.asList("123", "123", "123");
-        given(taskListService.getTaskList(any())).willReturn(taskListWithPermittedUsers);
-        given(userService.getUsername(any())).willReturn("123");
+        final List<UserResponse> permittedUsers = List.of(new UserResponse("jdoe", "John Doe"));
+        given(taskListService.existsById(any())).willReturn(true);
+        given(taskListService.getPermittedUsers(any())).willReturn(permittedUsers);
 
         // When
         final ResponseEntity<?> response = taskListController.getPermittedUsers(1L);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(usernames);
+        assertThat(response.getBody()).isEqualTo(permittedUsers);
     }
 
     @Test

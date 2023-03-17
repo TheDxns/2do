@@ -55,7 +55,7 @@
             style="width:300px;"
         ></v-text-field>
         <v-select v-else
-          v-model="task.responsible"
+          v-model="responsible"
           class="ml-8 mt-5"
           :items="permittedUsersNames"
           style="width:300px;"
@@ -85,7 +85,8 @@ export default {
       creatorName: this.keycloakData.idTokenParsed.given_name.concat(" ").concat(this.keycloakData.idTokenParsed.family_name),
       menu: false,
       newDeadline: '',
-      newTaskTitle: this.task.title
+      newTaskTitle: this.task.title,
+      responsible: this.task.responsible
     }
   },
   computed: {
@@ -143,8 +144,10 @@ export default {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
-        body:JSON.stringify({id:this.task.id, title:this.newTaskTitle, taskListId: this.task.taskListId, description:this.task.description, priority:this.task.priority, creatorId: this.task.creator.keycloakId, status: this.task.status, deadline: new Date(this.newDeadline),
-          responsible: this.task.responsible})
+        body:JSON.stringify({
+          id:this.task.id, title:this.newTaskTitle, taskListId: this.task.taskList.id, description:this.task.description,
+          priority:this.task.priority, creatorId: this.task.creator.keycloakId, status: this.task.status,
+          deadline: new Date(this.newDeadline), responsibleId: this.findUserIdByName(this.responsible) })
       }).then(response => response.text())
         .then((response) => {
             console.log(response);
@@ -155,6 +158,13 @@ export default {
     },
     getPermittedUsers() {
       this.$emit('loadUsersRequired');
+    },
+    findUserIdByName(responsible) {
+      const user = this.permittedUsers.find(user => user.name === responsible);
+      if (user) {
+        return user.id;
+      }
+      return null;
     }
   },
   filters: {

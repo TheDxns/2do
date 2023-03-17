@@ -1,6 +1,7 @@
 package io.github.thedxns.todo.task;
 
 import io.github.thedxns.todo.tasklist.TaskListDto;
+import io.github.thedxns.todo.user.KeycloakId;
 import io.github.thedxns.todo.user.UserDto;
 
 import java.time.LocalDateTime;
@@ -14,11 +15,10 @@ public class TaskDto {
     private final UserDto creator;
     private final TaskListDto taskList;
     private final LocalDateTime deadline;
-    private final LocalDateTime createdOn;
-    private final LocalDateTime updatedOn;
+    private final KeycloakId responsible;
 
     public TaskDto(Long id, String title, String description, TaskPriority priority, TaskStatus status, UserDto creator,
-                   TaskListDto taskList, LocalDateTime deadline, LocalDateTime createdOn, LocalDateTime updatedOn) {
+                   TaskListDto taskList, LocalDateTime deadline, KeycloakId responsible) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -27,12 +27,11 @@ public class TaskDto {
         this.creator = creator;
         this.taskList = taskList;
         this.deadline = deadline;
-        this.createdOn = createdOn;
-        this.updatedOn = updatedOn;
+        this.responsible = responsible;
     }
 
     public TaskDto(String title, String description, TaskPriority priority, TaskStatus status, UserDto creator,
-                   TaskListDto taskList, LocalDateTime deadline) {
+                   TaskListDto taskList, LocalDateTime deadline, KeycloakId responsible) {
         this.id = null;
         this.title = title;
         this.description = description;
@@ -41,28 +40,13 @@ public class TaskDto {
         this.creator = creator;
         this.taskList = taskList;
         this.deadline = deadline;
-        this.createdOn = null;
-        this.updatedOn = null;
-    }
-
-    public TaskDto(Long id, String title, String description, TaskPriority priority, TaskStatus status, UserDto creator,
-                   TaskListDto taskList, LocalDateTime deadline) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.priority = priority;
-        this.status = status;
-        this.creator = creator;
-        this.taskList = taskList;
-        this.deadline = deadline;
-        this.createdOn = null;
-        this.updatedOn = null;
+        this.responsible = responsible;
     }
 
     public static TaskDto from(Task task) {
         return new TaskDto(task.getId(), task.getTitle(), task.getContent(), task.getPriority(), task.getStatus(),
                 new UserDto(task.getCreatorId(), task.getResponsible(), null), TaskListDto.from(task.getTaskList()),
-                task.getDeadline(), task.getCreatedOn(), task.getUpdatedOn());
+                task.getDeadline(), new KeycloakId(task.getResponsible()));
     }
 
     public Long getId() {
@@ -97,11 +81,7 @@ public class TaskDto {
         return deadline;
     }
 
-    public LocalDateTime getCreatedOn() {
-        return createdOn;
-    }
-
-    public LocalDateTime getUpdatedOn() {
-        return updatedOn;
+    public KeycloakId getResponsible() {
+        return responsible;
     }
 }

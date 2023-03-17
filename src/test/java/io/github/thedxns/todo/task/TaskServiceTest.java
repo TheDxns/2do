@@ -41,7 +41,7 @@ public class TaskServiceTest {
         final TaskListDto taskList = new TaskListDto(1L, "Test", new KeycloakId("123"), Collections.emptyList());
         return new TaskTestBuilder().id(1L).taskList(taskList).title("Test").description("Test task")
                 .priority(TaskPriority.MINOR).status(TaskStatus.WAITING).creator(prepareTestUser()).deadline(LocalDateTime.now())
-                .createdOn(LocalDateTime.now()).updatedOn(null).build();
+                .responsible(new KeycloakId("responsibleUserId")).build();
     }
 
     private List<Task> prepareRandomTestTasks() {
@@ -50,23 +50,23 @@ public class TaskServiceTest {
 
         tasks.add(new Task(new TaskTestBuilder().id(1L).taskList(taskList).title("Test").description("Test task")
                 .priority(TaskPriority.MINOR).status(TaskStatus.WAITING).creator(prepareTestUser()).deadline(LocalDateTime.now())
-                .createdOn(LocalDateTime.now()).updatedOn(null).build()));
+                .responsible(new KeycloakId("responsibleUserId")).build()));
 
         tasks.add(new Task(new TaskTestBuilder().id(2L).taskList(null).title("Test").description("Test task")
                 .priority(TaskPriority.MINOR).status(TaskStatus.IN_PROGRESS).creator(prepareTestUser()).deadline(LocalDateTime.now())
-                .createdOn(LocalDateTime.now()).updatedOn(null).build()));
+                .responsible(new KeycloakId("responsibleUserId")).build()));
 
         tasks.add(new Task(new TaskTestBuilder().id(3L).taskList(null).title("Test").description("Test task")
                 .priority(TaskPriority.MAJOR).status(TaskStatus.DONE).creator(prepareTestUser()).deadline(LocalDateTime.now())
-                .createdOn(LocalDateTime.now()).updatedOn(null).build()));
+                .responsible(new KeycloakId("responsibleUserId")).build()));
 
         tasks.add(new Task(new TaskTestBuilder().id(4L).taskList(null).title("Test").description("Test task")
                 .priority(TaskPriority.MAJOR).status(TaskStatus.IN_PROGRESS).creator(prepareTestUser()).deadline(LocalDateTime.now())
-                .createdOn(LocalDateTime.now()).updatedOn(null).build()));
+                .responsible(new KeycloakId("responsibleUserId")).build()));
 
         tasks.add(new Task(new TaskTestBuilder().id(5L).taskList(null).title("Test").description("Test task")
                 .priority(TaskPriority.MAJOR).status(TaskStatus.DELETED).creator(prepareTestUser()).deadline(LocalDateTime.now())
-                .createdOn(LocalDateTime.now()).updatedOn(null).build()));
+                .responsible(new KeycloakId("responsibleUserId")).build()));
 
         return tasks;
     }

@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 import io.github.thedxns.todo.tasklist.TaskListDto;
+import io.github.thedxns.todo.tasklist.TaskListService;
 import io.github.thedxns.todo.user.KeycloakId;
 import io.github.thedxns.todo.user.UserDto;
 import io.github.thedxns.todo.user.UserTestBuilder;
@@ -22,6 +23,9 @@ public class TaskControllerTest {
 	@Mock
 	TaskService taskService;
 
+	@Mock
+	TaskListService taskListService;
+
 	@InjectMocks
 	TaskController taskController;
 
@@ -32,14 +36,14 @@ public class TaskControllerTest {
 
 	private TaskRequest prepareTaskRequest() {
 		return new TaskRequest("Test", "Description", TaskPriority.MINOR, TaskStatus.WAITING,
-				"123", 1L, LocalDateTime.now());
+				"123", 1L, LocalDateTime.now(), "456");
 	}
 
 	private TaskDto prepareTestTask() {
 		final TaskListDto taskList = new TaskListDto(1L, "Test", new KeycloakId("123"), Collections.emptyList());
 		return new TaskTestBuilder().id(1L).taskList(taskList).title("Test").description("Test task")
 				.priority(TaskPriority.MINOR).status(TaskStatus.WAITING).creator(prepareTestUser()).deadline(LocalDateTime.now())
-				.createdOn(LocalDateTime.now()).updatedOn(null).build();
+				.responsible(new KeycloakId("responsibleUserId")).build();
 	}
 
 	private UserDto prepareTestUser() {
@@ -177,7 +181,7 @@ public class TaskControllerTest {
 	@Test
 	public void saveCustomTask_shouldReturn200ResponseWhenTaskWasSaved() {
 		// Given
-		given(taskService.existsById(any())).willReturn(true);
+		given(taskListService.existsById(any())).willReturn(true);
 		given(taskService.saveCustomListTask(any(), any())).willReturn(true);
 
 		// When
@@ -198,7 +202,7 @@ public class TaskControllerTest {
 	@Test
 	public void saveCustomTask_shouldReturn500ResponseWhenTaskCouldNotBeSaved() {
 		// Given
-		given(taskService.existsById(any())).willReturn(true);
+		given(taskListService.existsById(any())).willReturn(true);
 		given(taskService.saveCustomListTask(any(), any())).willReturn(false);
 
 		// When

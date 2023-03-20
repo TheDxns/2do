@@ -46,10 +46,12 @@
           :first-day-of-week="1"
           locale="pl"
         ></v-date-picker>
+
       </v-menu>
+          <vue-timepicker class="ml-8"></vue-timepicker>
         <v-text-field v-if="this.currentListId == null"
             class="ml-8 mt-5"
-            v-model="this.keycloakData.idTokenParsed.preferred_username"
+            v-model="currentUsersFullName"
             label="Zadanie przypisane do:"
             readonly
             style="width:300px;"
@@ -77,6 +79,8 @@
 </template>
 
 <script>
+import VueTimepicker from 'vue2-timepicker/src/vue-timepicker.vue'
+
 export default {
   name: 'Task',
   props: ['task', 'keycloakData', 'permittedUsers', 'currentListId'],
@@ -88,6 +92,9 @@ export default {
       newTaskTitle: this.task.title,
       responsible: this.task.responsible
     }
+  },
+  components: {
+    VueTimepicker
   },
   computed: {
     deadline: function() {
@@ -105,6 +112,9 @@ export default {
       let allUsernames = [this.task.creator.name];
       allUsernames = allUsernames.concat(this.permittedUsers.map(user => user.name));
       return allUsernames;
+    },
+    currentUsersFullName() {
+      return this.keycloakData.idTokenParsed.given_name + " " + this.keycloakData.idTokenParsed.family_name;q2
     }
   },
   methods: {

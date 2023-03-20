@@ -20,35 +20,40 @@
           placeholder="Tytuł zadania"
           v-model="newTaskTitle"
         ></v-text-field>
-        <v-menu
-        v-model="menu"
-        :close-on-content-click="false"
-        :nudge-right="40"
-        transition="scale-transition"
-        offset-y
-        min-width="auto"
-      >
-        <template v-slot:activator="{ on, attrs }">
-          <v-text-field
-            class=""
-            v-model="deadline"
-            label="Termin wykonania"
-            prepend-icon="mdi-calendar"
-            readonly
-            v-bind="attrs"
-            v-on="on"
-            style="width:300px;"
-          ></v-text-field>
-        </template>
-        <v-date-picker
-          v-model="newDeadline"
-          @input="menu = false"
-          :first-day-of-week="1"
-          locale="pl"
-        ></v-date-picker>
-
-      </v-menu>
-          <vue-timepicker class="ml-8"></vue-timepicker>
+          <v-row>
+            <v-col cols="3">
+              <v-menu
+              v-model="menu"
+              :close-on-content-click="false"
+              :nudge-right="40"
+              transition="scale-transition"
+              offset-y
+              min-width="auto"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  class=""
+                  v-model="deadline"
+                  label="Data"
+                  prepend-icon="mdi-calendar"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                  style="width:300px;"
+                ></v-text-field>
+              </template>
+              <v-date-picker
+                v-model="newDeadline"
+                @input="menu = false"
+                :first-day-of-week="1"
+                locale="pl"
+              ></v-date-picker>
+            </v-menu>
+            </v-col>
+            <v-col cols="6">
+              <vue-timepicker placeholder="Godzina" class="mt-4"></vue-timepicker>
+            </v-col>
+          </v-row>
         <v-text-field v-if="this.currentListId == null"
             class="ml-8 mt-5"
             v-model="currentUsersFullName"
@@ -114,7 +119,7 @@ export default {
       return allUsernames;
     },
     currentUsersFullName() {
-      return this.keycloakData.idTokenParsed.given_name + " " + this.keycloakData.idTokenParsed.family_name;q2
+      return this.keycloakData.idTokenParsed.given_name + " " + this.keycloakData.idTokenParsed.family_name;
     }
   },
   methods: {

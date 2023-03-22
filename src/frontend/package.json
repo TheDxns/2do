@@ -10,8 +10,10 @@
   "dependencies": {
     "@dsb-norge/vue-keycloak-js": "^2.1.1-beta",
     "core-js": "^3.6.5",
+    "luxon": "^3.3.0",
     "vue": "^2.6.11",
     "vue-router": "^3.5.3",
+    "vue2-timepicker": "^1.1.6",
     "vuetify": "^2.6.0"
   },
   "devDependencies": {

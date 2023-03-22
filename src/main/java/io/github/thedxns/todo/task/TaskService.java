@@ -28,7 +28,8 @@ class TaskService {
     }
 
     public List<TaskDto> getAllTasks() {
-        return taskRepository.findAll().stream().map(TaskDto::from).collect(Collectors.toList());
+        return taskRepository.findAll().stream().map(task -> TaskDto.from(task, userService.getUserById(
+                new KeycloakId(task.getCreatorId())))).collect(Collectors.toList());
     }
 
     public List<TaskDto> getTasksByKeyword(final String keyword) {
@@ -37,48 +38,56 @@ class TaskService {
         final Set<Task> set = new LinkedHashSet<>(tasks);
         tasks.clear();
         tasks.addAll(set);
-        return tasks.stream().map(TaskDto::from).collect(Collectors.toList());
+        return tasks.stream().map(task -> TaskDto.from(task, userService.getUserById(
+                new KeycloakId(task.getCreatorId())))).collect(Collectors.toList());
     }
     
     public TaskDto getTask(final Long id) {
         final Optional<Task> task = taskRepository.findById(id);
-        return task.map(TaskDto::from).orElse(null);
+        return task.map(v -> TaskDto.from(v, userService.getUserById(
+                new KeycloakId(v.getCreatorId())))).orElse(null);
     }
 
     public List<TaskDto> getTasksByList(final Long id) {
-        return taskRepository.findByTaskListId(id).stream().map(TaskDto::from).collect(Collectors.toList());
+        return taskRepository.findByTaskListId(id).stream().map(task -> TaskDto.from(task, userService.getUserById(
+                new KeycloakId(task.getCreatorId())))).collect(Collectors.toList());
     } 
 
     public List<TaskDto> getAllByCreator(final String creatorId) {
-        return taskRepository.findByCreatorId(creatorId).stream().map(TaskDto::from).collect(Collectors.toList());
+        return taskRepository.findByCreatorId(creatorId).stream().map(task -> TaskDto.from(task, userService.getUserById(
+                new KeycloakId(task.getCreatorId())))).collect(Collectors.toList());
     }
 
     public List<TaskDto> getUnfinishedByCreator(final String creatorId) {
         final List<Task> allTasks = taskRepository.findByCreatorId(creatorId);
         return allTasks.stream()
             .filter(t -> !t.getStatus().equals(TaskStatus.DONE) && !t.getStatus().equals(TaskStatus.DELETED) &&
-                    t.getTaskList() == null).map(TaskDto::from).collect(Collectors.toList());
+                    t.getTaskList() == null).map(task -> TaskDto.from(task, userService.getUserById(
+                        new KeycloakId(task.getCreatorId())))).collect(Collectors.toList());
     }
 
     public List<TaskDto> getDoneByCreator(final String creatorId) {
         final List<Task> allTasks = taskRepository.findByCreatorId(creatorId);
         return allTasks.stream()
-            .filter(t -> t.getStatus().equals(TaskStatus.DONE) && t.getTaskList() == null).map(TaskDto::from)
-                .collect(Collectors.toList());
+            .filter(t -> t.getStatus().equals(TaskStatus.DONE) && t.getTaskList() == null).map(
+                    task -> TaskDto.from(task, userService.getUserById(new KeycloakId(task.getCreatorId()
+                    )))).collect(Collectors.toList());
     }
 
     public List<TaskDto> getImportantByCreator(final String creatorId) {
         final List<Task> allTasks = taskRepository.findByCreatorId(creatorId);
         return allTasks.stream()
             .filter(t -> !t.getStatus().equals(TaskStatus.DONE) && !t.getStatus().equals(TaskStatus.DELETED)
-                    && t.getPriority().equals(TaskPriority.MAJOR)).map(TaskDto::from).collect(Collectors.toList());
+                    && t.getPriority().equals(TaskPriority.MAJOR)).map(task -> TaskDto.from(task, userService.getUserById(
+                        new KeycloakId(task.getCreatorId())))).collect(Collectors.toList());
     }
 
     public List<TaskDto> getCustom(final Long listId) {
         final List<Task> allTasks = taskRepository.findByTaskListId(listId);
         return allTasks.stream()
             .filter(t -> !t.getStatus().equals(TaskStatus.DONE) && !t.getStatus().equals(TaskStatus.DELETED)
-                    && t.getTaskList() != null).map(TaskDto::from).collect(Collectors.toList());
+                    && t.getTaskList() != null).map(task -> TaskDto.from(task, userService.getUserById(
+                        new KeycloakId(task.getCreatorId())))).collect(Collectors.toList());
     }
 
     public boolean saveTask(final TaskRequest taskData) {

@@ -20,36 +20,43 @@
           placeholder="Tytuł zadania"
           v-model="newTaskTitle"
         ></v-text-field>
-        <v-menu
-        v-model="menu"
-        :close-on-content-click="false"
-        :nudge-right="40"
-        transition="scale-transition"
-        offset-y
-        min-width="auto"
-      >
-        <template v-slot:activator="{ on, attrs }">
-          <v-text-field
-            class=""
-            v-model="deadline"
-            label="Termin wykonania"
-            prepend-icon="mdi-calendar"
-            readonly
-            v-bind="attrs"
-            v-on="on"
-            style="width:300px;"
-          ></v-text-field>
-        </template>
-        <v-date-picker
-          v-model="newDeadline"
-          @input="menu = false"
-          :first-day-of-week="1"
-          locale="pl"
-        ></v-date-picker>
-      </v-menu>
+          <v-row>
+            <v-col cols="3">
+              <v-menu
+              v-model="menu"
+              :close-on-content-click="false"
+              :nudge-right="40"
+              transition="scale-transition"
+              offset-y
+              min-width="auto"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  class=""
+                  v-model="newDate"
+                  label="Data"
+                  prepend-icon="mdi-calendar"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                  style="width:300px;"
+                ></v-text-field>
+              </template>
+              <v-date-picker
+                v-model="newDate"
+                @input="menu = false"
+                :first-day-of-week="1"
+                locale="pl"
+              ></v-date-picker>
+            </v-menu>
+            </v-col>
+            <v-col cols="6">
+              <vue-timepicker placeholder="Godzina" format="HH:mm" v-model="newTime" class="mt-4"></vue-timepicker>
+            </v-col>
+          </v-row>
         <v-text-field v-if="this.currentListId == null"
             class="ml-8 mt-5"
-            v-model="this.keycloakData.idTokenParsed.preferred_username"
+            v-model="currentUsersFullName"
             label="Zadanie przypisane do:"
             readonly
             style="width:300px;"
@@ -77,6 +84,9 @@
 </template>
 
 <script>
+import VueTimepicker from 'vue2-timepicker/src/vue-timepicker.vue'
+import { DateTime } from 'luxon';
+
 export default {
   name: 'Task',
   props: ['task', 'keycloakData', 'permittedUsers', 'currentListId'],
@@ -84,27 +94,29 @@ export default {
     return {
       creatorName: this.keycloakData.idTokenParsed.given_name.concat(" ").concat(this.keycloakData.idTokenParsed.family_name),
       menu: false,
-      newDeadline: '',
       newTaskTitle: this.task.title,
-      responsible: this.task.responsible
+      responsible: this.task.responsible,
+      newDate: '',
+      newTime: {
+        HH: '',
+        mm: ''
+      },
     }
   },
+  components: {
+    VueTimepicker
+  },
+  created() {
+    this.disassembleDeadline(this.task.deadline);
+  },
   computed: {
-    deadline: function() {
-      if (this.newDeadline === '' && this.task.deadline == null) {
-        return null;
-      } else if (this.newDeadline === '') {
-        let date = new Date(this.task.deadline);
-        date.setDate(date.getDate() + 1);
-        return date.toISOString().substring(0, 10);
-      } else {
-        return this.newDeadline;
-      } 
-    },
     permittedUsersNames() {
       let allUsernames = [this.task.creator.name];
       allUsernames = allUsernames.concat(this.permittedUsers.map(user => user.name));
       return allUsernames;
+    },
+    currentUsersFullName() {
+      return this.keycloakData.idTokenParsed.given_name + " " + this.keycloakData.idTokenParsed.family_name;
     }
   },
   methods: {
@@ -147,7 +159,7 @@ export default {
         body:JSON.stringify({
           id:this.task.id, title:this.newTaskTitle, taskListId: this.task.taskList.id, description:this.task.description,
           priority:this.task.priority, creatorId: this.task.creator.keycloakId, status: this.task.status,
-          deadline: new Date(this.newDeadline), responsibleId: this.findUserIdByName(this.responsible) })
+          deadline: this.assembleDeadline(this.newDate, this.newTime), responsibleId: this.findUserIdByName(this.responsible) })
       }).then(response => response.text())
         .then((response) => {
             console.log(response);
@@ -165,7 +177,21 @@ export default {
         return user.id;
       }
       return null;
-    }
+    },
+    assembleDeadline(newDate, newTime) {
+      const dateTimeString = `${newDate}T${newTime.HH}:${newTime.mm}:00.000`;
+      const dateTime = DateTime.fromISO(dateTimeString, { setZone: true }).toLocal();
+      return dateTime.toISODate() + 'T' + dateTime.toFormat('HH:mm:ss');
+    },
+    disassembleDeadline(dateTimeString) {
+      if(dateTimeString != null) {
+        const dateTime = DateTime.fromISO(dateTimeString, { setZone: true });
+
+        this.newDate = dateTime.toFormat('yyyy-MM-dd');
+        this.newTime.HH = dateTime.toFormat('HH');
+        this.newTime.mm = dateTime.toFormat('mm');
+      }
+    },
   },
   filters: {
     formatDate: function(date) {

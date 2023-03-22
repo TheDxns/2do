@@ -43,10 +43,9 @@ public class TaskDto {
         this.responsible = responsible;
     }
 
-    public static TaskDto from(Task task) {
+    public static TaskDto from(Task task, UserDto user) {
         return new TaskDto(task.getId(), task.getTitle(), task.getContent(), task.getPriority(), task.getStatus(),
-                new UserDto(task.getCreatorId(), task.getResponsible(), null), TaskListDto.from(task.getTaskList()),
-                task.getDeadline(), new KeycloakId(task.getResponsible()));
+                user, TaskListDto.from(task.getTaskList()), task.getDeadline(), new KeycloakId(task.getResponsible()));
     }
 
     public Long getId() {

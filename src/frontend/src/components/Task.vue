@@ -33,7 +33,7 @@
               <template v-slot:activator="{ on, attrs }">
                 <v-text-field
                   class=""
-                  v-model="deadline"
+                  v-model="newDate"
                   label="Data"
                   prepend-icon="mdi-calendar"
                   readonly
@@ -43,7 +43,7 @@
                 ></v-text-field>
               </template>
               <v-date-picker
-                v-model="newDeadline"
+                v-model="newDate"
                 @input="menu = false"
                 :first-day-of-week="1"
                 locale="pl"
@@ -51,7 +51,7 @@
             </v-menu>
             </v-col>
             <v-col cols="6">
-              <vue-timepicker placeholder="Godzina" class="mt-4"></vue-timepicker>
+              <vue-timepicker placeholder="Godzina" format="HH:mm" v-model="newTime" class="mt-4"></vue-timepicker>
             </v-col>
           </v-row>
         <v-text-field v-if="this.currentListId == null"
@@ -85,6 +85,7 @@
 
 <script>
 import VueTimepicker from 'vue2-timepicker/src/vue-timepicker.vue'
+import { DateTime } from 'luxon';
 
 export default {
   name: 'Task',
@@ -93,26 +94,22 @@ export default {
     return {
       creatorName: this.keycloakData.idTokenParsed.given_name.concat(" ").concat(this.keycloakData.idTokenParsed.family_name),
       menu: false,
-      newDeadline: '',
       newTaskTitle: this.task.title,
-      responsible: this.task.responsible
+      responsible: this.task.responsible,
+      newDate: '',
+      newTime: {
+        HH: '',
+        mm: ''
+      },
     }
   },
   components: {
     VueTimepicker
   },
+  created() {
+    this.disassembleDeadline(this.task.deadline);
+  },
   computed: {
-    deadline: function() {
-      if (this.newDeadline === '' && this.task.deadline == null) {
-        return null;
-      } else if (this.newDeadline === '') {
-        let date = new Date(this.task.deadline);
-        date.setDate(date.getDate() + 1);
-        return date.toISOString().substring(0, 10);
-      } else {
-        return this.newDeadline;
-      } 
-    },
     permittedUsersNames() {
       let allUsernames = [this.task.creator.name];
       allUsernames = allUsernames.concat(this.permittedUsers.map(user => user.name));
@@ -162,7 +159,7 @@ export default {
         body:JSON.stringify({
           id:this.task.id, title:this.newTaskTitle, taskListId: this.task.taskList.id, description:this.task.description,
           priority:this.task.priority, creatorId: this.task.creator.keycloakId, status: this.task.status,
-          deadline: new Date(this.newDeadline), responsibleId: this.findUserIdByName(this.responsible) })
+          deadline: this.assembleDeadline(this.newDate, this.newTime), responsibleId: this.findUserIdByName(this.responsible) })
       }).then(response => response.text())
         .then((response) => {
             console.log(response);
@@ -180,7 +177,21 @@ export default {
         return user.id;
       }
       return null;
-    }
+    },
+    assembleDeadline(newDate, newTime) {
+      const dateTimeString = `${newDate}T${newTime.HH}:${newTime.mm}:00.000`;
+      const dateTime = DateTime.fromISO(dateTimeString, { setZone: true }).toLocal();
+      return dateTime.toISODate() + 'T' + dateTime.toFormat('HH:mm:ss');
+    },
+    disassembleDeadline(dateTimeString) {
+      if(dateTimeString != null) {
+        const dateTime = DateTime.fromISO(dateTimeString, { setZone: true });
+
+        this.newDate = dateTime.toFormat('yyyy-MM-dd');
+        this.newTime.HH = dateTime.toFormat('HH');
+        this.newTime.mm = dateTime.toFormat('mm');
+      }
+    },
   },
   filters: {
     formatDate: function(date) {

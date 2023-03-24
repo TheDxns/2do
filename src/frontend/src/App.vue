@@ -19,6 +19,7 @@
       </v-row>
     </v-main>
   </v-app>
+  <v-snackbar v-model="showSnackbar" :color="color" :timeout="timeout">{{ message }}</v-snackbar>
 </template>
 
 <script>
@@ -30,6 +31,28 @@ export default {
   components: {
     Navbar,
     Footer
+  },
+  data() {
+    return {
+      showSnackbar: false,
+      message: '',
+      color: '',
+      timeout: 3000
+    }
+  },
+  methods: {
+    showNotification(message, color) {
+      this.message = message
+      this.color = color
+      this.showSnackbar = true
+    },
+    notificationHandler(payload) {
+      this.showNotification(payload.message, payload.color);
+    }
+  },
+  mounted() {
+    // Register the notification handler to listen for incoming notifications
+    this.$root.$on('notification', this.notificationHandler);
   }
 }
 </script>

@@ -1,22 +1,19 @@
 package io.github.thedxns.todo.notification;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
 
-@RestController
-@RequestMapping("/notification")
+@Controller
 public class NotificationController {
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
-    @PostMapping
-    public void sendNotification(@RequestBody NotificationRequest payload) {
-        messagingTemplate.convertAndSend("/topic/notification", payload);
+    @MessageMapping("/notify")
+    public void sendNotification(NotificationRequest payload) {
+        messagingTemplate.convertAndSend("/topic/notifications", payload);
     }
 
 }

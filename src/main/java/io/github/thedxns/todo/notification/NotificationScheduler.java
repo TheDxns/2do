@@ -40,6 +40,6 @@ public class NotificationScheduler {
 
         final HttpEntity<NotificationRequest> entity = new HttpEntity<>(notification, headers);
 
-        restTemplate.postForObject("http://localhost:80/notifications", entity, Void.class);
+        restTemplate.postForObject("http://localhost:9000/notifications", entity, Void.class);
     }
 }

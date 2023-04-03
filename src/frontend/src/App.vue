@@ -14,17 +14,19 @@
       </v-row>
       <v-row class="mt-16 mb-16">
       </v-row>
+      <v-snackbar v-model="showSnackbar" :color="color" :timeout="timeout">{{ message }}</v-snackbar>
       <v-row class="mt-16">
           <Footer/>
       </v-row>
     </v-main>
   </v-app>
-  <v-snackbar v-model="showSnackbar" :color="color" :timeout="timeout">{{ message }}</v-snackbar>
 </template>
 
 <script>
 import Navbar from '@/components/Navbar.vue'
 import Footer from '@/components/Footer.vue'
+import WebSocketService from '@/services/WebSocketService'
+
 export default {
   name: 'App',
   props: ['keycloakData'],
@@ -37,7 +39,8 @@ export default {
       showSnackbar: false,
       message: '',
       color: '',
-      timeout: 3000
+      timeout: 3000,
+      notifications: []
     }
   },
   methods: {
@@ -48,11 +51,17 @@ export default {
     },
     notificationHandler(payload) {
       this.showNotification(payload.message, payload.color);
+    },
+    onConnected(stompClient) {
+      WebSocketService.subscribe(stompClient, '/topic/notifications', this.onNotification.bind(this));
+    },
+    onNotification(notification) {
+      this.notifications.push(JSON.parse(notification));
+      this.notificationHandler(notification);
     }
   },
   mounted() {
-    // Register the notification handler to listen for incoming notifications
-    this.$root.$on('notification', this.notificationHandler);
+    WebSocketService.connect(this.onConnected.bind(this));
   }
 }
 </script>

@@ -183,14 +183,14 @@ export default {
     },
     methods: {
       getLists() {
-        fetch("/api/lists/permitted/" + this.$keycloak.idTokenParsed.sub)
+        fetch("http://localhost:9000/api/lists/permitted/" + this.$keycloak.idTokenParsed.sub)
           .then((response) => response.json())
           .then((data) => {
             this.lists = data;
           })
       },
       createNewCustomList() {
-          fetch("/api/lists", {
+          fetch("http://localhost:9000/api/lists", {
                   method: 'post',
                   headers: {
                     'Accept': 'application/json',

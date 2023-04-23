@@ -56,7 +56,8 @@ export default {
       WebSocketService.subscribe(stompClient, '/topic/notifications', this.onNotification.bind(this));
     },
     onNotification(notification) {
-      this.notifications.push(JSON.parse(notification));
+      console.log(notification)
+      this.notifications.push(notification.message);
       this.notificationHandler(notification);
     }
   },

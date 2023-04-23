@@ -121,7 +121,7 @@ export default {
   },
   methods: {
     deleteTask() {
-      fetch("/api/tasks/" + this.task.id, { method: 'delete' })
+      fetch("http://localhost:9000/api/tasks/" + this.task.id, { method: 'delete' })
         .then(response => response.text())
         .then((response) => {
             console.log(response.status);
@@ -130,7 +130,7 @@ export default {
         .catch(err => console.log(err));
     },
     setTaskAsDone() {
-      fetch("/api/tasks/finish/" + this.task.id, { method: 'PATCH',
+      fetch("http://localhost:9000/api/tasks/finish/" + this.task.id, { method: 'PATCH',
       headers: {
           'Accept': '*',
           'Host': ''
@@ -142,7 +142,7 @@ export default {
         .catch(err => console.log(err));
     },
     toggleImportant() {
-      fetch("/api/tasks/prioritize/" + this.task.id, { method: 'PATCH' })
+      fetch("http://localhost:9000/api/tasks/prioritize/" + this.task.id, { method: 'PATCH' })
         .then((response) => {
             console.log(response.status);
             this.$emit('dataUpdate')
@@ -150,7 +150,7 @@ export default {
         .catch(err => console.log(err));
     },
     updateTask() {
-      fetch("/api/tasks/"+ this.task.id, {
+      fetch("http://localhost:9000/api/tasks/"+ this.task.id, {
         method: 'put',
         headers: {
           'Accept': 'application/json',

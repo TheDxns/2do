@@ -22,21 +22,19 @@ public class NotificationScheduler {
     }
 
     //TODO: Move the delay value to properties
-    @Scheduled(fixedDelay = 30000) // Means it will run every minute
+    @Scheduled(fixedDelay = 60000) // It will run every minute
     @Transactional
     public void sendNotifications() {
-//        final List<TaskDto> approachingTasks = taskService.findApproachingTasks();
-//
-//        for (TaskDto task : approachingTasks) {
-//            sendNotification(task);
-//        }
-        final List<TaskDto> tasks = taskService.getAllTasks();
-        sendNotification(tasks.get(0));
+        final List<TaskDto> approachingTasks = taskService.findApproachingTasks();
+
+        for (TaskDto task : approachingTasks) {
+            sendNotification(task);
+        }
     }
 
     private void sendNotification(TaskDto task) {
         final String message = "Task '" + task.getTitle() + "' deadline is " + task.getDeadline();
-        final NotificationRequest notification = new NotificationRequest(message, "warning");
+        final NotificationRequest notification = new NotificationRequest(message, "red");
         messagingTemplate.convertAndSend("/topic/notifications", notification);
     }
 }

@@ -39,8 +39,7 @@ export default {
       showSnackbar: false,
       message: '',
       color: '',
-      timeout: 3000,
-      notifications: []
+      timeout: 3000
     }
   },
   methods: {
@@ -56,8 +55,6 @@ export default {
       WebSocketService.subscribe(stompClient, '/topic/notifications', this.onNotification.bind(this));
     },
     onNotification(notification) {
-      console.log(notification)
-      this.notifications.push(notification.message);
       this.notificationHandler(notification);
     }
   },

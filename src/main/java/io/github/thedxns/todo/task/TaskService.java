@@ -8,6 +8,7 @@ import io.github.thedxns.todo.user.UserService;
 
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +16,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-class TaskService {
+public class TaskService {
 
     private final TaskListService taskListService;
     private final UserService userService;
@@ -158,5 +159,12 @@ class TaskService {
         } else {
             throw new RuntimeException("Task with given ID does not exist.");
         }
+    }
+
+    public List<TaskDto> findApproachingTasks() {
+        final LocalDateTime oneHourFromNow = LocalDateTime.now().plusHours(1);
+        final List<Task> tasks = taskRepository.findByDeadline(oneHourFromNow);
+        return tasks.stream().map(task -> TaskDto.from(task, userService.getUserById(
+                new KeycloakId(task.getCreatorId())))).collect(Collectors.toList());
     }
 }

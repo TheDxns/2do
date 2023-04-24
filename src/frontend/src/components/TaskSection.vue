@@ -208,7 +208,7 @@ import Task from '@/components/Task.vue'
           this.getCustomListTasks();
         },
         getUnfinishedTasks() {
-          fetch("/api/tasks/unfinished/user/" + this.$keycloak.idTokenParsed.sub)
+          fetch("http://localhost:9000/api/tasks/unfinished/user/" + this.$keycloak.idTokenParsed.sub)
             .then((response) => response.json())
             .then((data) => {
               data.sort(function compare(a, b) {
@@ -227,7 +227,7 @@ import Task from '@/components/Task.vue'
             })
         },
         getImportantTasks() {
-          fetch("/api/tasks/important/user/" + this.$keycloak.idTokenParsed.sub)
+          fetch("http://localhost:9000/api/tasks/important/user/" + this.$keycloak.idTokenParsed.sub)
             .then((response) => response.json())
             .then((data) => {
                 data.sort(function compare(a, b) {
@@ -246,7 +246,7 @@ import Task from '@/components/Task.vue'
             })
         },
         getDoneTasks() {
-          fetch("/api/tasks/done/user/" + this.$keycloak.idTokenParsed.sub)
+          fetch("http://localhost:9000/api/tasks/done/user/" + this.$keycloak.idTokenParsed.sub)
             .then((response) => response.json())
             .then((data) => {
                 data.sort(function compare(a, b) {
@@ -267,7 +267,7 @@ import Task from '@/components/Task.vue'
         getCustomListTasks() {
           setTimeout(() => {  
           if (this.currentListId != null) {
-            fetch("/api/tasks/unfinished/custom/" + this.currentListId)
+            fetch("http://localhost:9000/api/tasks/unfinished/custom/" + this.currentListId)
               .then((response) => response.json())
               .then((data) => {
                   data.sort(function compare(a, b) {
@@ -287,7 +287,7 @@ import Task from '@/components/Task.vue'
               }, 100);
         },
         getAllUsers() {
-          fetch("/api/users/username")
+          fetch("http://localhost:9000/api/users/username")
               .then((response) => response.json())
               .then((data) => {
                   this.allUsers = data;
@@ -307,7 +307,7 @@ import Task from '@/components/Task.vue'
           } else {
             taskPriority = "MINOR";
           }
-          fetch("/api/tasks", {
+          fetch("http://localhost:9000/api/tasks", {
                   method: 'post',
                   headers: {
                     'Accept': 'application/json',
@@ -332,7 +332,7 @@ import Task from '@/components/Task.vue'
           } else {
             taskPriority = "MINOR";
           }
-          fetch("/api/tasks/" + this.currentListId, {
+          fetch("http://localhost:9000/api/tasks/" + this.currentListId, {
                   method: 'post',
                   headers: {
                     'Accept': 'application/json',
@@ -351,7 +351,7 @@ import Task from '@/components/Task.vue'
                   .catch(err => console.log(err));
         },
         deleteTaskList() {
-          fetch("/api/lists/" + this.currentListId, { method: 'delete' })
+          fetch("http://localhost:9000/api/lists/" + this.currentListId, { method: 'delete' })
             .then(response => response.text())
             .then((response) => {
                 console.log(response.status);
@@ -366,7 +366,7 @@ import Task from '@/components/Task.vue'
           } else if(this.keycloakData.idTokenParsed.preferred_username === this.username) {
             window.alert("Podany użytkownik jest właścicielem listy.")
           } else {
-          fetch("/api/lists/access/" + this.currentListId + "/" + this.username, { method: 'PATCH',
+          fetch("http://localhost:9000/api/lists/access/" + this.currentListId + "/" + this.username, { method: 'PATCH',
           headers: {
               'Accept': '*',
               'Host': ''
@@ -383,7 +383,7 @@ import Task from '@/components/Task.vue'
         }
         },
         updateCustomList() {
-          fetch("/api/lists/" + this.currentListId, {
+          fetch("http://localhost:9000/api/lists/" + this.currentListId, {
         method: 'put',
         headers: {
           'Accept': 'application/json',
@@ -404,14 +404,14 @@ import Task from '@/components/Task.vue'
           this.newListName = this.currentListName;
         },
         getPermittedUsers() {
-          fetch("/api/lists/access/" + this.currentListId)
+          fetch("http://localhost:9000/api/lists/access/" + this.currentListId)
           .then((response) => response.json())
               .then((data) => {
                   this.permittedUsers = data;
               })
         },
         removeAccess(username) {
-          fetch("/api/lists/access/remove/" + this.currentListId + "/" + username, { method: 'PATCH',
+          fetch("http://localhost:9000/api/lists/access/remove/" + this.currentListId + "/" + username, { method: 'PATCH',
           headers: {
             'Accept': '*',
             'Host': ''

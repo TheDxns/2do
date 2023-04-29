@@ -11,7 +11,6 @@
 
 # Used technologies:
 - Spring Boot
-- Keycloak
 - Vue.js
 - Vuetify
 - WebSockets

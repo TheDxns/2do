@@ -27,8 +27,8 @@ public class UserController {
 	}
 
     @GetMapping("/{id}")
-	public ResponseEntity<?> getUser(@PathVariable String id) {
-        final UserDto user = userService.getUserById(new KeycloakId(id));
+	public ResponseEntity<?> getUser(@PathVariable Long id) {
+        final UserDto user = userService.getUserById(id));
         if (user == null) {
             return ResponseEntity.notFound().build();
         } else {
@@ -37,8 +37,8 @@ public class UserController {
     }
 
     @GetMapping("/id/{key}")
-	public ResponseEntity<?> getUserIdByUsername(@PathVariable String key) {
-        final KeycloakId userId = userService.getUserId(key);
+	public ResponseEntity<?> getUserIdByUsername(@PathVariable String username) {
+        final Long userId = userService.getUserId(username);
         if (userId == null) {
             return ResponseEntity.notFound().build();
         } else {
@@ -48,7 +48,7 @@ public class UserController {
 
     @GetMapping("/username/{key}")
     public ResponseEntity<?> getUsername(@PathVariable String key) {
-        final String username = userService.getUsername(new KeycloakId(key));
+        final String username = userService.getUsername(key);
         if (username == null) {
             return ResponseEntity.notFound().build();
         } else {

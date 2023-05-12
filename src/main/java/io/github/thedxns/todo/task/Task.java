@@ -24,7 +24,7 @@ class Task {
     private TaskPriority priority;
     private TaskStatus status;
     @NotBlank(message = "The ID of the creator of the post must be set")
-    private String creatorId;
+    private Long creatorId;
     private String responsible;
     @ManyToOne
     @JoinColumn(name = "task_list_id")
@@ -43,7 +43,7 @@ class Task {
         title = source.getTitle();
         content = source.getDescription();
         priority = source.getPriority();
-        creatorId = source.getCreator().getKeycloakId();
+        creatorId = source.getCreator();
         status = source.getStatus();
         deadline = source.getDeadline();
         responsible = source.getCreator().getKeycloakId();

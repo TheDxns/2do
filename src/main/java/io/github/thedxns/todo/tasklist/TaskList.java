@@ -1,11 +1,9 @@
 package io.github.thedxns.todo.tasklist;
 
-import io.github.thedxns.todo.user.KeycloakId;
-
 import org.springframework.data.annotation.PersistenceConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -26,8 +24,8 @@ public class TaskList {
     @Column(length = 200)
     @NotBlank
     private String ownerId;
-    @ElementCollection(targetClass=String.class)
-    private List<String> users;
+    @ElementCollection(targetClass=Long.class)
+    private List<Long> userIds;
 
     @PersistenceConstructor
     public TaskList() {
@@ -37,7 +35,7 @@ public class TaskList {
         this.id = dto.getId();
         this.title = dto.getTitle();
         this.ownerId = dto.getOwner().getId();
-        this.users = dto.getUsers() != null ? dto.getUsers().stream().map(KeycloakId::getId).collect(Collectors.toList()) : null;
+        this.userIds = dto.getUserIds() != null ? new ArrayList<>(dto.getUserIds()) : null;
     }
 
     public Long getId() {
@@ -56,12 +54,12 @@ public class TaskList {
         this.title = title;
     }
 
-    public List<String> getUsers() {
-        return users;
+    public List<Long> getUserIds() {
+        return userIds;
     }
 
-    public void setUsers(List<String> users) {
-        this.users = users;
+    public void setUserIds(List<Long> userIds) {
+        this.userIds = userIds;
     }
 
     public String getOwnerId() {

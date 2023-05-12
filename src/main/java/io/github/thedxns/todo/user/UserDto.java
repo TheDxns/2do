@@ -1,18 +1,19 @@
 package io.github.thedxns.todo.user;
 
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import java.util.List;
+
 public class UserDto {
-    private final String keycloakId;
     private final String name;
     private final String username;
 
-    public UserDto(String keycloakId, String name, String username) {
-        this.keycloakId = keycloakId;
+    private final List<SimpleGrantedAuthority> roles;
+
+    public UserDto(String name, String username, List<SimpleGrantedAuthority> roles) {
         this.name = name;
         this.username = username;
-    }
-
-    public String getKeycloakId() {
-        return keycloakId;
+        this.roles = roles;
     }
 
     public String getName() {
@@ -23,7 +24,11 @@ public class UserDto {
         return username;
     }
 
-    public static UserDto from(KeycloakUserResponse userResponse) {
+    public List<SimpleGrantedAuthority> getRoles() {
+        return roles;
+    }
+
+    public static UserDto from(User user) {
         return new UserDto(userResponse.getId(), userResponse.getFirstName() + " " + userResponse.getLastName(),
                 userResponse.getUsername());
     }

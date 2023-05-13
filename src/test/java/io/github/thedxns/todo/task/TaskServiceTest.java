@@ -12,13 +12,13 @@ import java.util.*;
 
 import io.github.thedxns.todo.tasklist.TaskListDto;
 import io.github.thedxns.todo.tasklist.TaskListService;
-import io.github.thedxns.todo.user.KeycloakId;
 import io.github.thedxns.todo.user.UserDto;
 import io.github.thedxns.todo.user.UserService;
 import io.github.thedxns.todo.user.UserTestBuilder;
 import org.junit.jupiter.api.*;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 public class TaskServiceTest {
 
@@ -38,41 +38,42 @@ public class TaskServiceTest {
     }
 
     private TaskDto prepareTestTask() {
-        final TaskListDto taskList = new TaskListDto(1L, "Test", new KeycloakId("123"), Collections.emptyList());
+        final TaskListDto taskList = new TaskListDto(1L, "Test", 12L, Collections.emptyList());
         return new TaskTestBuilder().id(1L).taskList(taskList).title("Test").description("Test task")
                 .priority(TaskPriority.MINOR).status(TaskStatus.WAITING).creator(prepareTestUser()).deadline(LocalDateTime.now())
-                .responsible(new KeycloakId("responsibleUserId")).build();
+                .responsibleId(5L).build();
     }
 
     private List<Task> prepareRandomTestTasks() {
-        final TaskListDto taskList = new TaskListDto(1L, "Test", new KeycloakId("123"), Collections.emptyList());
+        final TaskListDto taskList = new TaskListDto(1L, "Test", 12L, Collections.emptyList());
         final List<Task> tasks = new ArrayList<>();
 
         tasks.add(new Task(new TaskTestBuilder().id(1L).taskList(taskList).title("Test").description("Test task")
                 .priority(TaskPriority.MINOR).status(TaskStatus.WAITING).creator(prepareTestUser()).deadline(LocalDateTime.now())
-                .responsible(new KeycloakId("responsibleUserId")).build()));
+                .responsibleId(12L).build()));
 
         tasks.add(new Task(new TaskTestBuilder().id(2L).taskList(null).title("Test").description("Test task")
                 .priority(TaskPriority.MINOR).status(TaskStatus.IN_PROGRESS).creator(prepareTestUser()).deadline(LocalDateTime.now())
-                .responsible(new KeycloakId("responsibleUserId")).build()));
+                .responsibleId(12L).build()));
 
         tasks.add(new Task(new TaskTestBuilder().id(3L).taskList(null).title("Test").description("Test task")
                 .priority(TaskPriority.MAJOR).status(TaskStatus.DONE).creator(prepareTestUser()).deadline(LocalDateTime.now())
-                .responsible(new KeycloakId("responsibleUserId")).build()));
+                .responsibleId(12L).build()));
 
         tasks.add(new Task(new TaskTestBuilder().id(4L).taskList(null).title("Test").description("Test task")
                 .priority(TaskPriority.MAJOR).status(TaskStatus.IN_PROGRESS).creator(prepareTestUser()).deadline(LocalDateTime.now())
-                .responsible(new KeycloakId("responsibleUserId")).build()));
+                .responsibleId(12L).build()));
 
         tasks.add(new Task(new TaskTestBuilder().id(5L).taskList(null).title("Test").description("Test task")
                 .priority(TaskPriority.MAJOR).status(TaskStatus.DELETED).creator(prepareTestUser()).deadline(LocalDateTime.now())
-                .responsible(new KeycloakId("responsibleUserId")).build()));
+                .responsibleId(12L).build()));
 
         return tasks;
     }
 
     private UserDto prepareTestUser() {
-        return new UserTestBuilder().name("John Doe").keycloakId("123").build();
+        final List<SimpleGrantedAuthority> roles = Arrays.asList(new SimpleGrantedAuthority("ROLE_USER"), new SimpleGrantedAuthority("ROLE_ADMIN"));
+        return new UserTestBuilder().id(1L).username("jdoe").firstName("John").surname("Doe").email("jdoe@mail.com").roles(roles).build();
     }
 
     @Test
@@ -141,30 +142,30 @@ public class TaskServiceTest {
     @Test
     public void getUnfinishedByCreator_shouldReturnNonDoneAndNonDeletedUnfinishedTasksThatAreNotOnCustomList() {
         // Given
-        given(taskRepositoryMock.findByCreatorId(any())).willReturn(prepareRandomTestTasks());
+        given(taskRepositoryMock.findByCreatorId(anyLong())).willReturn(prepareRandomTestTasks());
 
         // When
         // Then
-        assertThat(taskService.getUnfinishedByCreator("123")).hasSize(2);
+        assertThat(taskService.getUnfinishedByCreator(15L)).hasSize(2);
     }
 
     @Test
     public void getImportantByCreator_shouldReturnNonDoneAndNonDeletedTasksWithMajorPriorityThatAreNotOnCustomList() {
         // Given
-        given(taskRepositoryMock.findByCreatorId(any())).willReturn(prepareRandomTestTasks());
+        given(taskRepositoryMock.findByCreatorId(anyLong())).willReturn(prepareRandomTestTasks());
 
         // When
         // Then
-        assertThat(taskService.getImportantByCreator("123")).hasSize(1);
+        assertThat(taskService.getImportantByCreator(15L)).hasSize(1);
     }
     @Test
     public void getDoneByCreator_shouldReturnDoneAndNonDeletedTasksThatAreNotOnCustomList() {
         // Given
-        given(taskRepositoryMock.findByCreatorId(any())).willReturn(prepareRandomTestTasks());
+        given(taskRepositoryMock.findByCreatorId(anyLong())).willReturn(prepareRandomTestTasks());
 
         // When
         // Then
-        assertThat(taskService.getDoneByCreator("123")).hasSize(1);
+        assertThat(taskService.getDoneByCreator(15L)).hasSize(1);
     }
 
     @Test
@@ -180,7 +181,7 @@ public class TaskServiceTest {
     @Test
     public void getCustom_shouldReturnNonDoneAndNonDeletedTasksThatAreOnCustomList() {
         // Given
-        given(taskRepositoryMock.findByTaskListId(any())).willReturn(prepareRandomTestTasks());
+        given(taskRepositoryMock.findByTaskListId(anyLong())).willReturn(prepareRandomTestTasks());
 
         // When
         // Then

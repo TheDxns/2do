@@ -8,8 +8,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,15 +37,16 @@ public class TaskListControllerTest {
     }
 
     private TaskListRequest prepareListRequest() {
-        return new TaskListRequest("Test", "123");
+        return new TaskListRequest("Test", 15L);
     }
 
     private TaskListDto prepareTestTaskList() {
-        return new TaskListDto(1L, "Test", new KeycloakId("123"), Collections.emptyList());
+        return new TaskListDto(1L, "Test", 2L, Collections.emptyList());
     }
 
     private UserDto prepareTestUser() {
-        return new UserTestBuilder().name("John Doe").keycloakId("123").build();
+        final List<SimpleGrantedAuthority> roles = Arrays.asList(new SimpleGrantedAuthority("ROLE_USER"), new SimpleGrantedAuthority("ROLE_ADMIN"));
+        return new UserTestBuilder().id(1L).username("jdoe").firstName("John").surname("Doe").email("jdoe@mail.com").roles(roles).build();
     }
 
     @Test
@@ -60,7 +63,7 @@ public class TaskListControllerTest {
     @Test
     public void updateTaskList_shouldReturn404ResponseWhenNoTaskListFound() {
         // Given
-        given(taskListService.existsById(any())).willReturn(false);
+        given(taskListService.existsById(anyLong())).willReturn(false);
 
         // When
         // Then
@@ -81,8 +84,8 @@ public class TaskListControllerTest {
     @Test
     public void deleteTaskList_shouldReturn200ResponseWhenTaskListCouldBeDeleted() {
         // Given
-        given(taskListService.existsById(any())).willReturn(true);
-        given(taskListService.deleteTaskList(any())).willReturn(true);
+        given(taskListService.existsById(anyLong())).willReturn(true);
+        given(taskListService.deleteTaskList(anyLong())).willReturn(true);
 
         // When
         // Then
@@ -92,7 +95,7 @@ public class TaskListControllerTest {
     @Test
     public void deleteTaskList_shouldReturn404ResponseWhenNoTaskListFound() {
         // Given
-        given(taskListService.existsById(any())).willReturn(false);
+        given(taskListService.existsById(anyLong())).willReturn(false);
 
         // When
         // Then
@@ -155,9 +158,9 @@ public class TaskListControllerTest {
     @Test
     public void grantAccessToUser_shouldReturn200ResponseWhenAccessToTaskListCouldBeSet() {
         // Given
-        given(userService.getUserById(any())).willReturn(prepareTestUser());
-        given(taskListService.existsById(any())).willReturn(true);
-        given(taskListService.grantAccessToUser(any(), any())).willReturn(true);
+        given(userService.getUserById(anyLong())).willReturn(prepareTestUser());
+        given(taskListService.existsById(anyLong())).willReturn(true);
+        given(taskListService.grantAccessToUser(anyLong(), anyLong())).willReturn(true);
 
         // When
         // Then
@@ -167,8 +170,8 @@ public class TaskListControllerTest {
     @Test
     public void grantAccessToUser_shouldReturn404ResponseWhenNoTaskListFound() {
         // Given
-        given(userService.getUserById(any())).willReturn(prepareTestUser());
-        given(taskListService.existsById(any())).willReturn(false);
+        given(userService.getUserById(anyLong())).willReturn(prepareTestUser());
+        given(taskListService.existsById(anyLong())).willReturn(false);
 
         // When
         // Then
@@ -178,9 +181,9 @@ public class TaskListControllerTest {
     @Test
     public void grantAccessToUser_shouldReturn500ResponseWhenAccessToTaskListCouldNotBeSet() {
         // Given
-        given(userService.getUserById(any())).willReturn(prepareTestUser());
-        given(taskListService.existsById(any())).willReturn(true);
-        given(taskListService.grantAccessToUser(any(), any())).willReturn(false);
+        given(userService.getUserById(anyLong())).willReturn(prepareTestUser());
+        given(taskListService.existsById(anyLong())).willReturn(true);
+        given(taskListService.grantAccessToUser(anyLong(), anyLong())).willReturn(false);
 
         // When
         // Then
@@ -190,9 +193,9 @@ public class TaskListControllerTest {
     @Test
     public void removeAccessToUser_shouldReturn200ResponseWhenAccessToTaskListCouldBeRemoved() {
         // Given
-        given(userService.getUserById(any())).willReturn(prepareTestUser());
-        given(taskListService.existsById(any())).willReturn(true);
-        given(taskListService.removeAccessOfUser(anyLong(), any())).willReturn(true);
+        given(userService.getUserById(anyLong())).willReturn(prepareTestUser());
+        given(taskListService.existsById(anyLong())).willReturn(true);
+        given(taskListService.removeAccessOfUser(anyLong(), anyLong())).willReturn(true);
 
         // When
         // Then
@@ -202,8 +205,8 @@ public class TaskListControllerTest {
     @Test
     public void removeAccessToUser_shouldReturn404ResponseWhenNoTaskListFound() {
         // Given
-        given(userService.getUserById(any())).willReturn(prepareTestUser());
-        given(taskListService.existsById(any())).willReturn(false);
+        given(userService.getUserById(anyLong())).willReturn(prepareTestUser());
+        given(taskListService.existsById(anyLong())).willReturn(false);
 
         // When
         // Then
@@ -213,9 +216,9 @@ public class TaskListControllerTest {
     @Test
     public void removeAccessToUser_shouldReturn500ResponseWhenAccessToTaskListCouldNotBeRemoved() {
         // Given
-        given(userService.getUserById(any())).willReturn(prepareTestUser());
-        given(taskListService.existsById(any())).willReturn(true);
-        given(taskListService.removeAccessOfUser(anyLong(), any())).willReturn(false);
+        given(userService.getUserById(anyLong())).willReturn(prepareTestUser());
+        given(taskListService.existsById(anyLong())).willReturn(true);
+        given(taskListService.removeAccessOfUser(anyLong(), anyLong())).willReturn(false);
 
         // When
         // Then
@@ -225,8 +228,8 @@ public class TaskListControllerTest {
     @Test
     public void getPermittedUsers_shouldReturn200ResponseAndUsernameListWhenPermittedUsersExist() {
         // Given
-        final List<UserResponse> permittedUsers = List.of(new UserResponse("id", "jdoe", "John Doe"));
-        given(taskListService.existsById(any())).willReturn(true);
+        final List<UserResponse> permittedUsers = List.of(new UserResponse(1L, "jdoe", "John", "Doe", "jdoemail.com"));
+        given(taskListService.existsById(anyLong())).willReturn(true);
         given(taskListService.getPermittedUsers(any())).willReturn(permittedUsers);
 
         // When
@@ -241,9 +244,8 @@ public class TaskListControllerTest {
     public void getPermittedUsers_shouldReturn200ResponseAndEmptyListWhenNoPermittedUsersFound() {
         // Given
         final List<UserResponse> userResponses = new ArrayList<>();
-        given(taskListService.existsById(any())).willReturn(true);
+        given(taskListService.existsById(anyLong())).willReturn(true);
         given(taskListService.getPermittedUsers(any())).willReturn(userResponses);
-        given(userService.getUsername(any())).willReturn("123");
 
         // When
         final ResponseEntity<?> response = taskListController.getPermittedUsers(1L);

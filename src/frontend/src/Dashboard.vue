@@ -16,11 +16,11 @@
                     outlined
                     tile
                     link
-                    @click="currentListName='Wszystkie zadania', currentListId = null"
+                    @click="currentList.name='All tasks', currentList.type='ALL', currentListId = null"
                   >
                     <v-card-text class="font-weight-light" style="max-height: 50px; overflow:hidden;">
                       <p class="text-h5 text--primary mx-2">
-                        Wszystkie zadania
+                        All tasks
                       </p>
                     </v-card-text>
                   </v-card>
@@ -35,11 +35,11 @@
                     outlined
                     tile
                     link
-                    @click="currentListName='Priorytetowe', currentListId=null"
+                    @click="currentList.name='High priority', currentList.type='HIGH_PRIORITY', currentListId=null"
                   >
                     <v-card-text class="font-weight-light" style="max-height: 50px; overflow: hidden;">
                       <p class="text-h5 text--primary mx-2">
-                        Priorytetowe
+                        High priority
                       </p>
                     </v-card-text>
                   </v-card>
@@ -54,11 +54,11 @@
                     outlined
                     tile
                     link
-                    @click="currentListName='Ukończone', currentListId=null"
+                    @click="currentList.name='Finished', currentList.type='FINISHED', currentListId=null"
                   >
                     <v-card-text class="font-weight-light" style="max-height: 50px; overflow:hidden;">
                       <p class="text-h5 text--primary mx-2">
-                        Ukończone
+                        Finished
                       </p>
                     </v-card-text>
                   </v-card>
@@ -73,7 +73,7 @@
                     outlined
                     tile
                     link
-                    @click="currentListName=list.title, currentListId=list.id, $refs.taskSectionComponent.getCustomListTasks()"
+                    @click="currentList.type=list.title, currentListId=list.id, $refs.taskSectionComponent.getCustomListTasks()"
                   >
                     <v-card-text class="font-weight-light" style="max-height: 50px; overflow:hidden;">
                       <p class="text-h5 green--text text--darken-1 mx-2">
@@ -156,7 +156,7 @@
           </v-row>
       </v-col>
       <v-col cols=10>
-          <TaskSection :currentListName="currentListName" :currentListId="currentListId" :keycloakData="keycloakData" ref="taskSectionComponent" @dataUpdate="getLists"/>
+          <TaskSection :currentList="currentList" :currentListId="currentListId" :keycloakData="keycloakData" ref="taskSectionComponent" @dataUpdate="getLists"/>
       </v-col>
   </v-row>
 </template>
@@ -170,7 +170,10 @@ export default {
         users: [],
         lists: [],
         listCreationMenu: false,
-        currentListName: 'Wszystkie zadania',
+        currentList: {
+          name: 'All tasks',
+          type: 'ALL'
+        },
         currentListId: null,
         newTaskListTitle: ''
       }

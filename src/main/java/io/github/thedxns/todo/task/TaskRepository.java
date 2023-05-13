@@ -8,8 +8,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 interface TaskRepository extends JpaRepository<Task, Long>{
-    List<Task> findByCreatorId(String creatorId);
-    List<Task> findByTaskListId(Long id);
+    List<Task> findByCreatorId(long creatorId);
+    List<Task> findByTaskListId(long id);
     List<Task> findByTitleContainingIgnoreCase(String keyword);
     List<Task> findByContentContainingIgnoreCase(String keyword);
     List<Task> findByDeadline(LocalDateTime deadline);

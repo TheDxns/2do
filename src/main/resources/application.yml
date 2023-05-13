@@ -7,13 +7,8 @@ spring:
     hibernate:
       ddl-auto: update
 
-keycloak:
-  realm: 'Todo'
-  auth-server-url: 'http://localhost:8080/auth'
-  resource: 'todo-api'
-  ssl-required: none
-  use-resource-role-mappings: true
-  bearer-only: true
+jwt:
+  secret: "secret"
 
 logging:
   level:

@@ -1,9 +1,9 @@
 <template>
   <div @keyup.enter="addTask">
     <p class="text-h5 text--primary mx-2 mt-7">
-      Obecnie wybrana lista: {{currentListName}}
+      Obecnie wybrana lista: {{currentList.name}}
     </p>
-    <div v-if="this.currentListName !== 'Wszystkie zadania' && this.currentListName !== 'Ukończone' && this.currentListName !== 'Priorytetowe'">
+    <div v-if="this.currentList.type !== 'ALL' && this.currentList.type !== 'FINISHED' && this.currentList.type !== 'HIGH_PRIORITY'">
       <v-menu
         v-model="listSharingMenu"
         :close-on-content-click="false"
@@ -129,7 +129,7 @@
           Usuń listę
       </v-btn>
     </div>
-    <div v-if="this.currentListName !== 'Ukończone'">
+    <div v-if="this.currentList.type !== 'FINISHED'">
       <v-text-field
         v-model="newTaskTitle"
         class="ml-3"
@@ -156,13 +156,13 @@
         Wykonane zadania:
       </p>
     </div>
-    <v-expansion-panels focusable v-if="this.currentListName === 'Wszystkie zadania'">
+    <v-expansion-panels focusable v-if="this.currentList.type === 'ALL'">
       <Task v-for="task in allTasks" :key="task.title" v-bind:task="task" :keycloakData="keycloakData" @dataUpdate="getAllTasks"/>
     </v-expansion-panels>
-    <v-expansion-panels focusable v-if="this.currentListName === 'Priorytetowe'">
+    <v-expansion-panels focusable v-if="this.currentList.type === 'HIGH_PRIORITY'">
       <Task v-for="task in importantTasks" :key="task.title" v-bind:task="task" :keycloakData="keycloakData" @dataUpdate="getAllTasks"/>
     </v-expansion-panels>
-    <v-expansion-panels focusable v-if="this.currentListName === 'Ukończone'">
+    <v-expansion-panels focusable v-if="this.currentList.type === 'FINISHED'">
       <Task v-for="task in doneTasks" :key="task.title" v-bind:task="task" :keycloakData="keycloakData" @dataUpdate="getAllTasks"/>
     </v-expansion-panels>
     <v-expansion-panels focusable v-if="this.currentListId != null">
@@ -175,7 +175,7 @@
 import Task from '@/components/Task.vue'
   export default {
     name: 'TaskSection',
-     props: ['currentListName', 'currentListId', 'keycloakData'],
+     props: ['currentList', 'currentListId', 'keycloakData'],
     data() {
       return {
         allTasks: [],
@@ -186,7 +186,7 @@ import Task from '@/components/Task.vue'
         listSharingMenu: false,
         listEditMenu: false,
         username: '',
-        newListName: this.currentListName,
+        newListName: this.currentList.type,
         allUsers: '',
         permittedUsers: []
       }
@@ -302,7 +302,7 @@ import Task from '@/components/Task.vue'
         },
         addStandardTask() {
           let taskPriority;
-          if (this.currentListName === "Priorytetowe") {
+          if (this.currentList.type === "HIGH_PRIORITY") {
             taskPriority = "MAJOR";
           } else {
             taskPriority = "MINOR";
@@ -327,7 +327,7 @@ import Task from '@/components/Task.vue'
         },
         addTaskToCustomList() {
           let taskPriority;
-          if (this.currentListName === "Priorytetowe") {
+          if (this.currentList.type === "HIGH_PRIORITY") {
             taskPriority = "MAJOR";
           } else {
             taskPriority = "MINOR";
@@ -395,13 +395,13 @@ import Task from '@/components/Task.vue'
             console.log(response);
             this.$emit('dataUpdate')
             setTimeout(() => { 
-            this.currentListName = this.newListName;
+            this.currentList.type = this.newListName;
             }, 500);
         })
         .catch(err => console.log(err));
         },
         updateListTitle() {
-          this.newListName = this.currentListName;
+          this.newListName = this.currentList.type;
         },
         getPermittedUsers() {
           fetch("http://localhost:9000/api/lists/access/" + this.currentListId)

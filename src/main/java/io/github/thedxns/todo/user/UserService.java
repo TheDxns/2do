@@ -1,47 +1,55 @@
 package io.github.thedxns.todo.user;
 
+import io.github.thedxns.todo.auth.AuthService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class UserService {
 
-    private final KeycloakApiClient keycloakApiClient;
+    private final UserRepository userRepository;
+    private final AuthService authService;
 
-    public UserService(KeycloakApiClient keycloakApiClient) {
-        this.keycloakApiClient = keycloakApiClient;
+    public UserService(UserRepository userRepository, AuthService authService) {
+        this.userRepository = userRepository;
+        this.authService = authService;
     }
 
     public List<UserDto> getAllUsers() {
-        return keycloakApiClient.getAllUsers().stream().map(UserDto::from).collect(Collectors.toList());
+        return userRepository.findAll().stream().map(UserDto::from).collect(Collectors.toList());
+    }
+
+    public UserDto getUserById(final long id) {
+        final Optional<User> user = userRepository.findById(id);
+        return user.map(UserDto::from).orElse(null);
     }
 
     public List<String> getAllUsernames() {
-        return keycloakApiClient.getAllUsers().stream().map(KeycloakUserResponse::getUsername).collect(Collectors.toList());
+        return getAllUsers().stream().map(UserDto::getUsername).collect(Collectors.toList());
     }
 
-    public UserDto getUserById(final KeycloakId id) {
-        final KeycloakUserResponse userResponse = keycloakApiClient.getUserById(id.getId());
-        return UserDto.from(userResponse);
+    public Long getUserId(String username) {
+        final Optional<User> user = userRepository.findByUsername(username);
+        return user.map(User::getId).orElse(null);
     }
 
-    public KeycloakId getUserId(final String username) {
-        final List<KeycloakUserResponse> userResponses = keycloakApiClient.getAllUsers();
-        final Optional<KeycloakUserResponse> userId = userResponses.stream().filter(
-                v -> Objects.equals(v.getUsername(), username)).findFirst();
-        if (userId.isPresent()) {
-            return new KeycloakId(userId.get().getId());
-        } else {
-            throw new RuntimeException("User not exist");
-        }
+    public User getEntityByUsername(String username) {
+        final Optional<User> user = userRepository.findByUsernameWithRoles(username);
+        return user.orElse(null);
     }
 
-    public String getUsername(final KeycloakId userId) {
-        final KeycloakUserResponse userResponse = keycloakApiClient.getUserById(userId.getId());
-        return userResponse.getUsername();
+    public boolean existsByUsername(final String username) {
+        return userRepository.existsByUsername(username);
+    }
+
+    public boolean saveUser(UserRequest userRequest) {
+        final User user = new User(null, userRequest.getUsername(), authService.encodePassword(userRequest.getPassword()),
+                userRequest.getFirstName(), userRequest.getSurname(), userRequest.getEmail(),
+                List.of("USER"));
+        userRepository.save(user);
+        return true;
     }
 }

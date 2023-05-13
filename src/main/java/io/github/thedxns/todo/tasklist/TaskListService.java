@@ -1,6 +1,5 @@
 package io.github.thedxns.todo.tasklist;
 
-import io.github.thedxns.todo.user.KeycloakId;
 import io.github.thedxns.todo.user.UserResponse;
 import io.github.thedxns.todo.user.UserService;
 import org.springframework.stereotype.Service;
@@ -30,17 +29,17 @@ public class TaskListService {
         return taskList.map(TaskListDto::from).orElse(null);
     }
 
-    List<TaskListDto> getAllByUserId(final String userId) {
-        return taskListRepository.findByUsers(userId).stream().map(TaskListDto::from).collect(Collectors.toList());
+    List<TaskListDto> getAllByUserId(final long userId) {
+        return taskListRepository.findByUserIds(userId).stream().map(TaskListDto::from).collect(Collectors.toList());
     }
 
-    List<TaskListDto> getAllByOwnerId(final String ownerId) {
+    List<TaskListDto> getAllByOwnerId(final long ownerId) {
         return taskListRepository.findByOwnerId(ownerId).stream().map(TaskListDto::from).collect(Collectors.toList());
     }
 
     boolean saveTaskList(final TaskListRequest taskListRequest) {
         final TaskListDto taskList = new TaskListDto(null, taskListRequest.getTitle(),
-                new KeycloakId(taskListRequest.getOwnerId()), null);
+                taskListRequest.getOwnerId(), null);
         taskListRepository.save(new TaskList(taskList));
         return true;
     }
@@ -56,43 +55,43 @@ public class TaskListService {
 
     boolean updateTaskList(final Long id, final TaskListRequest taskListRequest) {
         final TaskListDto updatedTaskList = new TaskListDto(id, taskListRequest.getTitle(),
-                new KeycloakId(taskListRequest.getOwnerId()), null);
+                taskListRequest.getOwnerId(), null);
         taskListRepository.save(new TaskList(updatedTaskList));
         return true;
     }
 
-    public boolean grantAccessToUser(final Long taskListId, final KeycloakId userId) {
+    public boolean grantAccessToUser(final long taskListId, final long userId) {
         final TaskList taskList = new TaskList(getTaskList(taskListId));
-        if (taskList.getOwnerId().equals(userId.getId())) {
+        if (taskList.getOwnerId() == userId) {
             throw new RuntimeException("Given user is the owner of the list");
         }
-        final List<String> users = taskList.getUsers();
-        users.add(userId.getId());
-        taskList.setUsers(users);
+        final List<Long> userIds = taskList.getUserIds();
+        userIds.add(userId);
+        taskList.setUserIds(userIds);
         taskListRepository.save(taskList);
         return true;
     }
 
-    public boolean removeAccessOfUser(final long taskListId, final KeycloakId userId) {
+    public boolean removeAccessOfUser(final long taskListId, final long userId) {
         final TaskList taskList = new TaskList(getTaskList(taskListId));
-        final List<String> users = taskList.getUsers();
-        users.remove(userId.getId());
-        taskList.setUsers(users);
+        final List<Long> userIds = taskList.getUserIds();
+        userIds.remove(userId);
+        taskList.setUserIds(userIds);
         taskListRepository.save(taskList);
         return true;
     }
 
     public List<UserResponse> getPermittedUsers(final Long id) {
         final TaskListDto taskList = getTaskList(id);
-        final List<KeycloakId> userIds = taskList.getUsers();
+        final List<Long> userIds = taskList.getUserIds();
         final List<UserResponse> permittedUsers = new ArrayList<>();
-        for (KeycloakId userId : userIds) {
+        for (long userId : userIds) {
             permittedUsers.add(UserResponse.from(userService.getUserById(userId)));
         }
         return permittedUsers;
     }
 
-    public List<TaskListDto> getAllPermittedForUser(String userId) {
+    public List<TaskListDto> getAllPermittedForUser(long userId) {
         final List<TaskListDto> allByOwner = getAllByOwnerId(userId);
         final List<TaskListDto> allByUser = getAllByUserId(userId);
         final List<TaskListDto> result = new ArrayList<>(allByOwner);

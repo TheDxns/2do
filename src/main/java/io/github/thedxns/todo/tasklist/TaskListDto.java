@@ -1,7 +1,6 @@
 package io.github.thedxns.todo.tasklist;
 
-import io.github.thedxns.todo.user.KeycloakId;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -9,20 +8,20 @@ public class TaskListDto {
 
     private final Long id;
     private final String title;
-    private final KeycloakId owner;
-    private final List<KeycloakId> users;
+    private final Long ownerId;
+    private final List<Long> userIds;
 
-    public TaskListDto(Long id, String title, KeycloakId owner, List<KeycloakId> users) {
+    public TaskListDto(Long id, String title, Long ownerId, List<Long> userIds) {
         this.id = id;
         this.title = title;
-        this.owner = owner;
-        this.users = users;
+        this.ownerId = ownerId;
+        this.userIds = userIds;
     }
 
     public static TaskListDto from(TaskList taskList) {
         if (taskList != null) {
-            return new TaskListDto(taskList.getId(), taskList.getTitle(), new KeycloakId(taskList.getOwnerId()),
-                    taskList.getUsers().stream().map(KeycloakId::new).collect(Collectors.toList()));
+            return new TaskListDto(taskList.getId(), taskList.getTitle(), taskList.getOwnerId(),
+                    new ArrayList<>(taskList.getUserIds()));
         }
         return null;
     }
@@ -35,11 +34,11 @@ public class TaskListDto {
         return title;
     }
 
-    public KeycloakId getOwner() {
-        return owner;
+    public Long getOwnerId() {
+        return ownerId;
     }
 
-    public List<KeycloakId> getUsers() {
-        return users;
+    public List<Long> getUserIds() {
+        return userIds;
     }
 }

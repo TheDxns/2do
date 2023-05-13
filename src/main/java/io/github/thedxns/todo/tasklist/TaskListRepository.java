@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 interface TaskListRepository extends JpaRepository<TaskList, Long> {
-    List<TaskList> findByUsers(String username);
+    List<TaskList> findByUserIds(long username);
 
-    List<TaskList> findByOwnerId(String ownerId);
+    List<TaskList> findByOwnerId(long ownerId);
 }

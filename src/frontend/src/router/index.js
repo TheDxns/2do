@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Dashboard from "@/Dashboard";
+import ProfileSettings from "@/ProfileSettings";
 
 Vue.use(VueRouter)
 
@@ -11,6 +12,14 @@ const routes = [
         component: Dashboard,
         meta: {
             title: "2DO - Dashboard"
+        }
+    },
+    {
+        path: '/profile-settings/:id',
+        name: 'Profile settings',
+        component: ProfileSettings,
+        meta: {
+            title: "2DO - Profile settings"
         }
     }
 ]
@@ -27,7 +36,6 @@ function sleep(ms) {
 
 router.beforeEach(async (to, from, next) => {
     if (to.matched.some(record => record.meta.requiresAuth)) {
-        // We wait for Keycloak init, then we can call all methods safely
         while (router.app.$keycloak.createLoginUrl === null) {
             await sleep(100)
         }

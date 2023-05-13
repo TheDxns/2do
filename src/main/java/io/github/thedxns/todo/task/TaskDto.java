@@ -44,7 +44,7 @@ public class TaskDto {
 
     public static TaskDto from(Task task, UserDto user) {
         return new TaskDto(task.getId(), task.getTitle(), task.getContent(), task.getPriority(), task.getStatus(),
-                user, TaskListDto.from(task.getTaskList()), task.getDeadline(), new long(task.getResponsible()));
+                user, TaskListDto.from(task.getTaskList()), task.getDeadline(), task.getResponsibleId());
     }
 
     public Long getId() {

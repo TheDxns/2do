@@ -6,7 +6,6 @@ import static org.mockito.BDDMockito.given;
 
 import io.github.thedxns.todo.tasklist.TaskListDto;
 import io.github.thedxns.todo.tasklist.TaskListService;
-import io.github.thedxns.todo.user.KeycloakId;
 import io.github.thedxns.todo.user.UserDto;
 import io.github.thedxns.todo.user.UserTestBuilder;
 import org.junit.jupiter.api.*;
@@ -14,9 +13,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 public class TaskControllerTest {
 
@@ -36,18 +38,19 @@ public class TaskControllerTest {
 
 	private TaskRequest prepareTaskRequest() {
 		return new TaskRequest("Test", "Description", TaskPriority.MINOR, TaskStatus.WAITING,
-				"123", 1L, LocalDateTime.now(), "456");
+				5L, 1L, LocalDateTime.now(), 6L);
 	}
 
 	private TaskDto prepareTestTask() {
-		final TaskListDto taskList = new TaskListDto(1L, "Test", new KeycloakId("123"), Collections.emptyList());
+		final TaskListDto taskList = new TaskListDto(1L, "Test", 2L, Collections.emptyList());
 		return new TaskTestBuilder().id(1L).taskList(taskList).title("Test").description("Test task")
 				.priority(TaskPriority.MINOR).status(TaskStatus.WAITING).creator(prepareTestUser()).deadline(LocalDateTime.now())
-				.responsible(new KeycloakId("responsibleUserId")).build();
+				.responsibleId(1).build();
 	}
 
 	private UserDto prepareTestUser() {
-		return new UserTestBuilder().name("John Doe").keycloakId("123").build();
+		final List<SimpleGrantedAuthority> roles = Arrays.asList(new SimpleGrantedAuthority("ROLE_USER"), new SimpleGrantedAuthority("ROLE_ADMIN"));
+		return new UserTestBuilder().id(1L).username("jdoe").firstName("John").surname("Doe").email("jdoe@mail.com").roles(roles).build();
 	}
 
 	@Test

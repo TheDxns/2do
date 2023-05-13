@@ -23,7 +23,7 @@ public class TaskList {
     private String title;
     @Column(length = 200)
     @NotBlank
-    private String ownerId;
+    private long ownerId;
     @ElementCollection(targetClass=Long.class)
     private List<Long> userIds;
 
@@ -34,7 +34,7 @@ public class TaskList {
     public TaskList(final TaskListDto dto) {
         this.id = dto.getId();
         this.title = dto.getTitle();
-        this.ownerId = dto.getOwner().getId();
+        this.ownerId = dto.getOwnerId();
         this.userIds = dto.getUserIds() != null ? new ArrayList<>(dto.getUserIds()) : null;
     }
 
@@ -62,11 +62,11 @@ public class TaskList {
         this.userIds = userIds;
     }
 
-    public String getOwnerId() {
+    public long getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(String ownerId) {
+    public void setOwnerId(long ownerId) {
         this.ownerId = ownerId;
     }
 }

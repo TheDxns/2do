@@ -2,7 +2,6 @@ package io.github.thedxns.todo.tasklist;
 
 import javax.validation.Valid;
 
-import io.github.thedxns.todo.user.KeycloakId;
 import io.github.thedxns.todo.user.UserService;
 
 import org.springframework.http.ResponseEntity;
@@ -43,7 +42,7 @@ class TaskListController {
     }
 
     @GetMapping("/permitted/{userId}")
-    public ResponseEntity<?> getTaskListsByUserId(@PathVariable String userId) {
+    public ResponseEntity<?> getTaskListsByUserId(@PathVariable long userId) {
         return ResponseEntity.ok(taskListService.getAllPermittedForUser(userId));
     }
 
@@ -84,7 +83,7 @@ class TaskListController {
 
     @PatchMapping("/access/{taskListId}/{username}")
     public ResponseEntity<?> grantAccessToUser(@PathVariable Long taskListId, @PathVariable String username) {
-        final KeycloakId userId = userService.getUserId(username);
+        final long userId = userService.getUserId(username);
         if (!taskListService.existsById(taskListId)) {
             return ResponseEntity.notFound().build();
         } else {
@@ -98,7 +97,7 @@ class TaskListController {
 
     @PatchMapping("/access/remove/{taskListId}/{username}")
     public ResponseEntity<?> removeAccessOfUser(@PathVariable Long taskListId, @PathVariable String username) {
-        final KeycloakId userId = userService.getUserId(username);
+        final long userId = userService.getUserId(username);
         if (!taskListService.existsById(taskListId)) {
             return ResponseEntity.notFound().build();
         } else {

@@ -34,27 +34,27 @@ class TaskController {
     }
 
     @GetMapping("/list/{id}")
-    public ResponseEntity<?> getTasksFromList(@PathVariable Long id) {
+    public ResponseEntity<?> getTasksFromList(@PathVariable long id) {
         return ResponseEntity.ok(taskService.getTasksByList(id));
     }
 
     @GetMapping("/user/{creatorId}")
-    public ResponseEntity<?> getTasksFromUser(@PathVariable String creatorId) {
+    public ResponseEntity<?> getTasksFromUser(@PathVariable long creatorId) {
         return ResponseEntity.ok(taskService.getAllByCreator(creatorId));
     }
 
     @GetMapping("/unfinished/user/{creatorId}")
-    public ResponseEntity<?> getUnfinishedTasksFromUser(@PathVariable String creatorId) {
+    public ResponseEntity<?> getUnfinishedTasksFromUser(@PathVariable long creatorId) {
         return ResponseEntity.ok(taskService.getUnfinishedByCreator(creatorId));
     }
     
     @GetMapping("/done/user/{creatorId}")
-    public ResponseEntity<?> getDoneTasksFromUser(@PathVariable String creatorId) {
+    public ResponseEntity<?> getDoneTasksFromUser(@PathVariable long creatorId) {
         return ResponseEntity.ok(taskService.getDoneByCreator(creatorId));
     }
 
     @GetMapping("/important/user/{creatorId}")
-    public ResponseEntity<?> getImportantTasksFromUser(@PathVariable String creatorId) {
+    public ResponseEntity<?> getImportantTasksFromUser(@PathVariable long creatorId) {
         return ResponseEntity.ok(taskService.getImportantByCreator(creatorId));
     }
 

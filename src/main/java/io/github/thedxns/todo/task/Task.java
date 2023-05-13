@@ -25,7 +25,7 @@ class Task {
     private TaskStatus status;
     @NotBlank(message = "The ID of the creator of the post must be set")
     private Long creatorId;
-    private String responsible;
+    private Long responsibleId;
     @ManyToOne
     @JoinColumn(name = "task_list_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -43,10 +43,10 @@ class Task {
         title = source.getTitle();
         content = source.getDescription();
         priority = source.getPriority();
-        creatorId = source.getCreator();
+        creatorId = source.getCreator().getId();
         status = source.getStatus();
         deadline = source.getDeadline();
-        responsible = source.getCreator().getKeycloakId();
+        responsibleId = source.getResponsibleUserId();
         taskList = source.getTaskList() != null ? new TaskList(source.getTaskList()) : null;
     }
 
@@ -124,11 +124,11 @@ class Task {
         this.updatedOn = updatedOn;
     }
 
-    public String getCreatorId() {
+    public Long getCreatorId() {
         return creatorId;
     }
 
-    public void setCreatorId(String creatorId) {
+    public void setCreatorId(Long creatorId) {
         this.creatorId = creatorId;
     }
 
@@ -140,11 +140,11 @@ class Task {
         this.deadline = deadline;
     }
 
-    public String getResponsible() {
-        return responsible;
+    public Long getResponsibleId() {
+        return responsibleId;
     }
 
-    public void setResponsible(String responsible) {
-        this.responsible = responsible;
+    public void setResponsibleId(Long responsibleId) {
+        this.responsibleId = responsibleId;
     }
 }

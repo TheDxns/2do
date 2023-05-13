@@ -13,12 +13,19 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @Column(length = 200)
+    @Column
     @NotBlank
     private String username;
-    @Column(length = 200)
+    @Column
     @NotBlank
     private String password;
+    @Column
+    private String firstName;
+    @Column
+    private String surname;
+    @Column
+    private String email;
+    @Column
     @ElementCollection(targetClass=String.class)
     private List<String> roles;
 
@@ -26,10 +33,13 @@ public class User {
     public User() {
     }
 
-    public User(Long id, String username, String password, List<String> roles) {
+    public User(Long id, String username, String password, String firstName, String surname, String email, List<String> roles) {
         this.id = id;
         this.username = username;
         this.password = password;
+        this.firstName = firstName;
+        this.surname = surname;
+        this.email = email;
         this.roles = roles;
     }
 
@@ -55,6 +65,30 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public List<String> getRoles() {

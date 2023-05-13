@@ -43,11 +43,11 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.flywaydb</groupId>
-				<artifactId>flyway-maven-plugin</artifactId>
-				<version>9.15.2</version>
-			</plugin>
+<!--			<plugin>-->
+<!--				<groupId>org.flywaydb</groupId>-->
+<!--				<artifactId>flyway-maven-plugin</artifactId>-->
+<!--				<version>9.15.2</version>-->
+<!--			</plugin>-->
 		</plugins>
 	</build>
 
@@ -138,10 +138,10 @@
 			<artifactId>jjwt</artifactId>
 			<version>0.9.1</version>
 		</dependency>
-		<dependency>
-			<groupId>org.flywaydb</groupId>
-			<artifactId>flyway-core</artifactId>
-			<version>9.17.0</version>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>org.flywaydb</groupId>-->
+<!--			<artifactId>flyway-core</artifactId>-->
+<!--			<version>9.17.0</version>-->
+<!--		</dependency>-->
 	</dependencies>
 </project>

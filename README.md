@@ -6,10 +6,10 @@
 - User registration and login
 - Task ownership
 - Task list sharing
-- Defining time frames for tasks
-- In app reminders
+- Defining deadline for tasks
+- In app reminders about task deadline
 
-# Used technologies:
+# Main technologies:
 - Spring Boot
 - Vue.js
 - Vuetify
